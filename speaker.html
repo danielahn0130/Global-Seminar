@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Speakers — Global Seminar</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="container nav">
+    <a class="brand" href="index.html"><div class="logo"></div><div><h1>Global Seminar</h1><p>Reticular Chemistry</p></div></a>
+    <nav class="links">
+      <a href="about.html" data-nav="about.html">About</a>
+      <a href="schedule.html" data-nav="schedule.html">Schedule</a>
+      <a href="speakers.html" data-nav="speakers.html">Speakers</a>
+      <a href="apply.html" data-nav="apply.html">Apply</a>
+      <a href="contact.html" data-nav="contact.html">Contact</a>
+    </nav>
+    <div class="split" style="margin:0">
+      <a class="btn primary" href="https://berkeley.zoom.us/j/98901820849" target="_blank" rel="noopener">Join on Zoom</a>
+      <button class="btn mobile-toggle" data-mobile-toggle aria-expanded="false" aria-controls="mobileMenu">Menu</button>
+    </div>
+  </div>
+  <div class="container mobile-panel" id="mobileMenu" data-mobile-panel>
+    <a href="about.html" data-nav="about.html">About</a>
+    <a href="schedule.html" data-nav="schedule.html">Schedule</a>
+    <a href="speakers.html" data-nav="speakers.html">Speakers</a>
+    <a href="apply.html" data-nav="apply.html">Apply</a>
+    <a href="contact.html" data-nav="contact.html">Contact</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="kicker"><span class="dot"></span> Speakers</div>
+      <h2>Upcoming & archive</h2>
+      <p>Search by speaker, PI, title, or date. (Archive is loaded from your CSV.)</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid two">
+      <div class="card">
+        <h3>Next talk</h3>
+        <div class="meta"><strong>Saber Mirzaei</strong> · Omar Yaghi group</div>
+        <div class="meta">Monday, March 2, 2026 · Time: TBA</div>
+        <p style="margin:10px 0 0; color: rgba(255,255,255,0.88);">
+          <strong>Title:</strong> Twelve-connected nanographene-based linkers in reticular chemistry
+        </p>
+        <div class="split">
+          <a class="btn primary" href="https://berkeley.zoom.us/j/98901820849" target="_blank" rel="noopener">Join Zoom</a>
+          <a class="btn gold" href="apply.html">Apply to speak</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Search archive</h3>
+        <input class="input" data-archive-search type="text" placeholder="Type: ‘Yaghi’, ‘COF’, ‘2025-07’, …" />
+        <p class="small" style="margin-top:10px">Tip: try keywords like “Zr”, “defect”, “membrane”, “flexibility”.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Speaker</th>
+              <th>PI / Lab</th>
+              <th>Talk title</th>
+            </tr>
+          </thead>
+          <tbody data-archive-body></tbody>
+        </table>
+      </div>
+      <p class="small" style="margin-top:10px">
+        If you later add affiliations, abstracts, or recording links, we can expand this table into clickable talk pages.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="container footer">
+  © <span data-year></span> Global Seminar · Reticular Chemistry
+</footer>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/archive.js"></script>
+<script src="assets/js/speakers.js"></script>
+</body>
+</html>
