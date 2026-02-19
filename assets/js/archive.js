@@ -5,23 +5,22 @@ async function loadArchive() {
     const res = await fetch(SHEET_URL);
     const text = await res.text();
 
-    // 1. Split into rows and FILTER out empty ones
-    // This splits the text into rows
-    const rows = text.split("\n").slice(1);
+    // 1. Split into rows
+    const allRows = text.split("\n").slice(1);
 
-    // This filter ensures the row actually has a Date and a Speaker 
-    // before we even try to process it.
-    const validRows = rows.filter(r => {
-      const parts = r.split(',');
-      return parts.length > 1 && parts[0].trim() !== "";
+    // 2. The "Security Guard": Only keep rows that have a speaker name
+    // This prevents those empty rows at the bottom of your Sheet from appearing
+    const rows = allRows.filter(r => {
+      const columns = r.split(',');
+      // Check if the 2nd column (Speaker) exists and isn't just empty space
+      return columns[1] && columns[1].trim() !== "";
     });
 
+    // 3. Process the valid rows
     const archive = rows.map(r => {
-      // This new logic splits the line correctly even with complex commas
       const cols = [];
       let startValue = 0;
       let inQuotes = false;
-
       for (let i = 0; i < r.length; i++) {
         if (r[i] === '"') inQuotes = !inQuotes;
         if (r[i] === ',' && !inQuotes) {
@@ -29,9 +28,8 @@ async function loadArchive() {
           startValue = i + 1;
         }
       }
-      cols.push(r.substring(startValue)); // Push the last column
+      cols.push(r.substring(startValue));
 
-      // Helper to clean up quotes and extra spaces
       const clean = (str) => str ? str.replace(/^["\s]+|["\s]+$/g, '').trim() : "";
 
       return {
@@ -43,8 +41,10 @@ async function loadArchive() {
       };
     });
 
-    // 3. Reverse the order so the bottom of the sheet is the top of the site
+    // 4. Flip the order so newest is on top
     archive.reverse();
+
+    // ... rest of your code (window.GS_ARCHIVE = archive, etc.)
 
     window.GS_ARCHIVE = archive;
     window.dispatchEvent(new CustomEvent('archiveLoaded'));
@@ -69,4 +69,5 @@ function renderNextTalk(data) {
 }
 
 loadArchive();
+
 
