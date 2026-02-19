@@ -70,13 +70,16 @@ function convertToLocalTime(dateStr) {
   eventDate.setUTCHours(hourUTC, 0, 0);
 
   // 4. Convert to the user's local string
-  const localTimeStr = eventDate.toLocaleTimeString([], { 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    timeZoneName: 'short' 
-  });
+  const options = { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+    
+    // Date shift logic
+    const utcDay = eventDate.getUTCDate();
+    const localDay = new Date(eventDate.toLocaleString('en-US')).getDate();
+    let shift = "";
+    if (localDay > utcDay) shift = " (+1 day)";
+    if (localDay < utcDay) shift = " (-1 day)";
 
-  return `Your time: ${localTimeStr}`;
+    return `Your time: ${eventDate.toLocaleTimeString([], options)}${shift}`;
 }
 
 function renderNextTalk(data) {
@@ -124,6 +127,7 @@ function renderNextTalk(data) {
 }
 
 loadArchive();
+
 
 
 
