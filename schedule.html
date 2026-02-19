@@ -48,23 +48,42 @@
   </section>
 
   <section class="section">
-    <div class="container grid two">
-      <div class="card">
-        <h3>Current cadence</h3>
-        <p class="meta">First Monday each month · 30–40 min talk + Q&A.</p>
-        <p class="small" style="margin-top:10px">
-          Times vary depending on speaker/time-zone fit. (You can add a “typical time” once you decide it.)
-        </p>
-      </div>
-      <div class="card">
-        <h3>Planned expansion</h3>
-        <p class="meta">First + Third Monday (two sessions/month).</p>
-        <p class="small" style="margin-top:10px">
-          This enables a “Europe-friendly” and an “Americas-friendly” slot (and later broader global coverage).
-        </p>
-      </div>
+  <div class="container">
+    <h3>Regional Time Guide</h3>
+    <p class="meta" style="margin-bottom: 20px;">We alternate sessions to ensure reticular chemists worldwide can join live during their daylight hours.</p>
+    
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Corridor</th>
+            <th>UTC Time</th>
+            <th>Americas (PT)</th>
+            <th>EMEA (London/Lagos)</th>
+            <th>Asia-Pacific (Tokyo)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Atlantic (1st Mon)</strong></td>
+            <td>17:00</td>
+            <td>09:00 AM</td>
+            <td>05:00 PM</td>
+            <td>02:00 AM*</td>
+          </tr>
+          <tr>
+            <td><strong>Pacific (3rd Mon)</strong></td>
+            <td>04:00</td>
+            <td>08:00 PM*</td>
+            <td>04:00 AM</td>
+            <td>01:00 PM</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </section>
+    <p class="small" style="margin-top:10px">*Note: Depending on your location, the talk may fall on the Sunday evening or Tuesday morning relative to UTC Monday.</p>
+  </div>
+</section>
 
   <section class="section">
     <div class="container">
@@ -83,8 +102,36 @@
   © <span data-year></span> Global Seminar · Reticular Chemistry
 </footer>
 
+<script>
+  window.addEventListener('load', () => {
+    const tableBody = document.querySelector('tbody');
+    
+    // Calculate Local Times
+    const atlantic = new Date();
+    atlantic.setUTCHours(17, 0, 0);
+    
+    const pacific = new Date();
+    pacific.setUTCHours(4, 0, 0);
+
+    const format = (d) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+
+    // Create a new row
+    const tr = document.createElement('tr');
+    tr.style.background = "var(--tint-gold)";
+    tr.innerHTML = `
+      <td><strong>Your Local Time</strong></td>
+      <td>—</td>
+      <td colspan="3" style="text-align: center; font-weight: bold;">
+        Atlantic: ${format(atlantic)} | Pacific: ${format(pacific)}
+      </td>
+    `;
+    tableBody.appendChild(tr);
+  });
+</script>
+  
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
