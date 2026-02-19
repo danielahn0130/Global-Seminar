@@ -78,12 +78,11 @@ h1,h2,h3,h4,h5,h6,strong{
   align-items:center;
 }
 
-.logo{
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(0,50,98,0.95), rgba(253,181,21,0.55));
-  border: 1px solid rgba(0,0,0,0.08);
+.logo-img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+  display:block;
 }
 
 .brand h1{
@@ -371,5 +370,6 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
