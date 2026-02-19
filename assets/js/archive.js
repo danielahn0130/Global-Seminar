@@ -55,8 +55,31 @@ async function loadArchive() {
   }
 }
 
+function convertToLocalTime(dateStr) {
+  if (!dateStr) return "";
+
+  // 1. Create a date object from the string in your sheet (e.g., "March 2, 2026")
+  const eventDate = new Date(dateStr);
+  if (isNaN(eventDate.getTime())) return "";
+
+  // 2. Logic: If day is 1-14, use 17:00 UTC. If 15-31, use 04:00 UTC.
+  const dayOfMonth = eventDate.getDate();
+  const hourUTC = (dayOfMonth <= 14) ? 17 : 4;
+
+  // 3. Set the hours in UTC
+  eventDate.setUTCHours(hourUTC, 0, 0);
+
+  // 4. Convert to the user's local string
+  const localTimeStr = eventDate.toLocaleTimeString([], { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    timeZoneName: 'short' 
+  });
+
+  return `Your time: ${localTimeStr}`;
+}
+
 function renderNextTalk(data) {
-  // We look for "Next" anywhere in the data now
   const next = data.find(d => d.status === "Next");
   if (!next) return;
 
@@ -65,9 +88,16 @@ function renderNextTalk(data) {
     document.getElementById("nextPI").innerText = next.pi;
     document.getElementById("nextTitle").innerText = next.title;
     document.getElementById("nextDate").innerText = next.date;
+    
+    // Add the converted time
+    const localTimeEl = document.getElementById("localTime");
+    if (localTimeEl) {
+      localTimeEl.innerText = convertToLocalTime(next.date);
+    }
   }
 }
 
 loadArchive();
+
 
 
