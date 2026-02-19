@@ -152,7 +152,7 @@ schedule.forEach(s => {
     const pacific = new Date();
     pacific.setUTCHours(4, 0, 0);
 
-    const format = (d) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+    const format = (d) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
 
     // Create a new row
     const tr = document.createElement('tr');
@@ -171,6 +171,7 @@ schedule.forEach(s => {
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
