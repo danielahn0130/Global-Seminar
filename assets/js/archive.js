@@ -1,42 +1,53 @@
-const SHEET_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?gid=0&single=true&output=csv;
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?gid=0&single=true&output=csv";
 
-async function loadArchive(){
+async function loadArchive() {
+  try {
+    const res = await fetch(SHEET_URL);
+    const text = await res.text();
 
-  const res = await fetch(SHEET_URL);
-  const text = await res.text();
+    // This splits the Google Sheet into rows
+    const rows = text.split("\n").slice(1);
 
-  const rows = text.split("\n").slice(1);
+    const archive = rows.map(r => {
+      const cols = r.split(",");
+      return {
+        date: cols[0],
+        speaker: cols[1],
+        pi: cols[2],
+        title: cols[3],
+        status: cols[4]
+      };
+    });
 
-  const archive = rows.map(r=>{
-    const cols = r.split(",");
-    return {
-      date: cols[0],
-      speaker: cols[1],
-      pi: cols[2],
-      title: cols[3],
-      status: cols[4]
-    };
-  });
+    // BABY STEP: This line "saves" the data so the speakers page can see it
+    window.GS_ARCHIVE = archive;
 
-  renderArchive(archive);
+    // This tells the browser: "Hey, I've finished downloading the data!"
+    window.dispatchEvent(new CustomEvent('archiveLoaded'));
 
-  renderNextTalk(archive);
-
+    // This updates the "Next Talk" box on your homepage
+    renderNextTalk(archive);
+    
+  } catch (error) {
+    console.error("Could not load the sheet:", error);
+  }
 }
 
-function renderNextTalk(data){
+function renderNextTalk(data) {
+  // Finds the row in your sheet where status is "Next"
+  const next = data.find(d => d.status.trim() === "Next");
 
-  const next = data.find(d=>d.status==="Next");
+  if (!next) return;
 
-  if(!next) return;
-
-  document.getElementById("nextSpeaker").innerText = next.speaker;
-  document.getElementById("nextPI").innerText = next.pi;
-  document.getElementById("nextTitle").innerText = next.title;
-  document.getElementById("nextDate").innerText = next.date;
-
+  // We look for the IDs in your HTML to fill them with info
+  // Note: We need to make sure your index.html has these IDs (see below)
+  if(document.getElementById("nextSpeaker")) {
+    document.getElementById("nextSpeaker").innerText = next.speaker;
+    document.getElementById("nextPI").innerText = next.pi;
+    document.getElementById("nextTitle").innerText = next.title;
+    document.getElementById("nextDate").innerText = next.date;
+  }
 }
 
+// This actually starts the whole process
 loadArchive();
-
-
