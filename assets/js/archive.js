@@ -47,7 +47,13 @@ function renderNextTalk(data) {
     document.getElementById("nextTitle").innerText = next.title;
     document.getElementById("nextDate").innerText = next.date;
   }
+const zoomBtn = document.querySelector('.hero .btn.primary');
+if (next.status === "Live" && zoomBtn) {
+    zoomBtn.classList.add('live-now');
+    zoomBtn.innerText = "🔴 Join Live Now";
+}
 }
 
 // This actually starts the whole process
 loadArchive();
+
