@@ -83,21 +83,48 @@ function renderNextTalk(data) {
   const next = data.find(d => d.status === "Next");
   if (!next) return;
 
-  if(document.getElementById("nextSpeaker")) {
-    document.getElementById("nextSpeaker").innerText = next.speaker;
-    document.getElementById("nextPI").innerText = next.pi;
-    document.getElementById("nextTitle").innerText = next.title;
-    document.getElementById("nextDate").innerText = next.date;
-    
-    // Add the converted time
-    const localTimeEl = document.getElementById("localTime");
-    if (localTimeEl) {
-      localTimeEl.innerText = convertToLocalTime(next.date);
-    }
+  const nextDateEl = document.getElementById("nextDate");
+  if (!nextDateEl) return;
+
+  // 1. Fill in basic info
+  document.getElementById("nextSpeaker").innerText = next.speaker;
+  document.getElementById("nextPI").innerText = next.pi;
+  document.getElementById("nextTitle").innerText = next.title;
+  nextDateEl.innerText = next.date;
+
+  // 2. Logic for Session Badges
+  const eventDate = new Date(next.date);
+  const day = eventDate.getDate();
+  
+  // Create the badge element
+  const badge = document.createElement("span");
+  badge.className = "session-badge";
+  
+  if (day <= 14) {
+    badge.innerText = "Session A: Atlantic Corridor";
+    badge.classList.add("badge-atlantic");
+  } else {
+    badge.innerText = "Session B: Pacific Corridor";
+    badge.classList.add("badge-pacific");
+  }
+
+  // 3. Put the badge at the top of the card (above the speaker name)
+  const card = document.querySelector(".card"); // Finds the next talk card
+  // Remove old badge if it exists so they don't stack
+  const oldBadge = card.querySelector(".session-badge");
+  if (oldBadge) oldBadge.remove();
+  
+  card.prepend(badge);
+
+  // 4. Update Local Time
+  const localTimeEl = document.getElementById("localTime");
+  if (localTimeEl) {
+    localTimeEl.innerText = convertToLocalTime(next.date);
   }
 }
 
 loadArchive();
+
 
 
 
