@@ -161,6 +161,18 @@ h1,h2,h3,h4,h5,h6,strong{
 }
 .btn.gold:hover{ filter: brightness(0.98); }
 
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+.btn.live-now {
+  background: #28a745 !important;
+  animation: pulse-green 2s infinite;
+  border: none;
+}
+
 /* ---------------------------
    Hero
 ---------------------------- */
@@ -370,6 +382,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
