@@ -47,43 +47,82 @@
     </div>
   </section>
 
-  <section class="section">
+<section class="section">
   <div class="container">
-    <h3>Regional Time Guide</h3>
-    <p class="meta" style="margin-bottom: 20px;">We alternate sessions to ensure reticular chemists worldwide can join live during their daylight hours.</p>
+    <h3>Global Corridor Guide</h3>
+    <p class="meta">Times automatically adjust for current Daylight Saving (DST) offsets.</p>
     
     <div class="tablewrap">
-      <table>
+      <table id="timeTable" style="table-layout: fixed; width: 100%;">
         <thead>
           <tr>
-            <th>Corridor</th>
-            <th>UTC Time</th>
-            <th>Americas (PT)</th>
-            <th>EMEA (London/Lagos)</th>
-            <th>Asia-Pacific (Tokyo)</th>
+            <th style="width: 20%;">Corridor</th>
+            <th style="width: 16%;">UTC</th>
+            <th style="width: 16%;">America (PT)</th>
+            <th style="width: 16%;">Eur/Afr (CET)</th>
+            <th style="width: 16%;">Gulf (GST)</th>
+            <th style="width: 16%;">Asia-Pac (CST)</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><strong>Atlantic (1st Mon)</strong></td>
-            <td>17:00</td>
-            <td>09:00 AM</td>
-            <td>05:00 PM</td>
-            <td>02:00 AM*</td>
-          </tr>
-          <tr>
-            <td><strong>Pacific (3rd Mon)</strong></td>
-            <td>04:00</td>
-            <td>08:00 PM*</td>
-            <td>04:00 AM</td>
-            <td>01:00 PM</td>
-          </tr>
-        </tbody>
+        <tbody id="scheduleBody">
+          </tbody>
       </table>
     </div>
     <p class="small" style="margin-top:10px">*Note: Depending on your location, the talk may fall on the Sunday evening or Tuesday morning relative to UTC Monday.</p>
   </div>
 </section>
+
+<script>
+function formatTime(utcHour, targetTimeZone) {
+    const now = new Date();
+    // Create a date object set to the correct UTC hour
+    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), utcHour, 0, 0));
+    
+    const options = {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: targetTimeZone,
+        hour12: true
+    };
+
+    // Calculate if there is a date shift relative to the UTC day
+    const utcDay = date.getUTCDate();
+    const localDay = new Date(date.toLocaleString('en-US', { timeZone: targetTimeZone })).getDate();
+    
+    let timeStr = date.toLocaleTimeString('en-US', options);
+    
+    if (localDay > utcDay) timeStr += " <span class='date-shift'>+1d</span>";
+    if (localDay < utcDay) timeStr += " <span class='date-shift'>-1d</span>";
+    
+    return timeStr;
+}
+
+const schedule = [
+    { name: "Atlantic", utc: 17 },
+    { name: "Pacific", utc: 4 }
+];
+
+const zones = [
+    "America/Los_Angeles",  // Americas (PT)
+    "Europe/Paris",         // Eur/Afr (CET)
+    "Asia/Dubai",           // Gulf (GST)
+    "Asia/Shanghai"         // Asia-Pac (CST) 
+];
+
+const body = document.getElementById('scheduleBody');
+schedule.forEach(s => {
+    const row = document.createElement('tr');
+    let html = `<td><strong>${s.name}</strong></td><td>${s.utc}:00</td>`;
+    
+    zones.forEach(zone => {
+        html += `<td>${formatTime(s.utc, zone)}</td>`;
+    });
+    
+    row.innerHTML = html;
+    body.appendChild(row);
+});
+</script>
+
 
   <section class="section">
     <div class="container">
@@ -132,6 +171,7 @@
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
