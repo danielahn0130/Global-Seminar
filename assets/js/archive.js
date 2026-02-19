@@ -6,7 +6,8 @@ async function loadArchive() {
     const text = await res.text();
 
     // This splits the Google Sheet into rows
-    const rows = text.split("\n").slice(1);
+    // This splits into rows AND removes any row that is completely empty
+    const rows = text.split("\n").slice(1).filter(r => r.trim().length > 0);
 
     const archive = rows.map(r => {
       const cols = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
@@ -56,5 +57,6 @@ if (next.status === "Live" && zoomBtn) {
 
 // This actually starts the whole process
 loadArchive();
+
 
 
