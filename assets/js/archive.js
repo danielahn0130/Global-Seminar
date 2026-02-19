@@ -20,6 +20,8 @@ async function loadArchive() {
       };
     });
 
+    archive.reverse(); // This flips the list so the newest entry in the sheet is on top
+
     // BABY STEP: This line "saves" the data so the speakers page can see it
     window.GS_ARCHIVE = archive;
 
@@ -57,6 +59,7 @@ if (next.status === "Live" && zoomBtn) {
 
 // This actually starts the whole process
 loadArchive();
+
 
 
 
