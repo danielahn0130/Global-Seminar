@@ -1,28 +1,44 @@
-window.addEventListener('archiveLoaded', () => {
+// This waits for that "archiveLoaded" signal we created in archive.js
+window.addEventListener('archiveLoaded', function() {
   const body = document.querySelector("[data-archive-body]");
   const search = document.querySelector("[data-archive-search]");
+  
+  // Get the data we saved to the window
   const rows = window.GS_ARCHIVE || [];
 
-  function render(list) {
-    body.innerHTML = list.map(r => `
-      <tr>
+  // This function draws the table on the screen
+  function renderTable(list) {
+    if (!body) return;
+    
+    body.innerHTML = ""; // Clear the table first
+    
+    list.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
         <td>${r.date}</td>
         <td><strong>${r.speaker}</strong></td>
         <td>${r.pi}</td>
         <td>${r.title}</td>
-      </tr>
-    `).join('');
+      `;
+      body.appendChild(tr);
+    });
   }
 
-  search.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase();
-    const filtered = rows.filter(r => 
-      r.speaker.toLowerCase().includes(q) || 
-      r.pi.toLowerCase().includes(q) || 
-      r.title.toLowerCase().includes(q)
-    );
-    render(filtered);
-  });
+  // This makes the search bar work
+  if (search) {
+    search.addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      
+      const filteredResults = rows.filter(r => {
+        return r.speaker.toLowerCase().includes(query) || 
+               r.pi.toLowerCase().includes(query) || 
+               r.title.toLowerCase().includes(query);
+      });
+      
+      renderTable(filteredResults);
+    });
+  }
 
-  render(rows); // Initial render
+  // Draw the full table when the page first loads
+  renderTable(rows);
 });
