@@ -1,4 +1,4 @@
-const SHEET_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?output=csv;
+const SHEET_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?gid=0&single=true&output=csv;
 
 async function loadArchive(){
 
@@ -38,3 +38,4 @@ function renderNextTalk(data){
 }
 
 loadArchive();
+
