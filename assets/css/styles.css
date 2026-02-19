@@ -331,12 +331,22 @@ thead th{
   border-bottom: 1px solid rgba(11,18,32,0.10);
 }
 
-tbody td{
+tbody td {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(11,18,32,0.06);
-  vertical-align: top;
+  /* CHANGE: Change 'top' to 'middle' so text is centered vertically */
+  vertical-align: middle; 
+  /* ADD: This forces the rows to have a consistent height */
+  height: 64px; 
   font-size: 13px;
   color: var(--ink);
+}
+
+/* This targets the 4th column (Talk Title) specifically */
+tbody td:nth-child(4) {
+  min-width: 300px;
+  max-width: 500px;
+  line-height: 1.4;
 }
 
 tbody tr:hover{
@@ -382,6 +392,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
