@@ -377,6 +377,54 @@ tbody tr:hover{
   background: rgba(0,50,98,0.03);
 }
 
+/* Schedule Page Specific Table Styles */
+.schedule-table {
+  table-layout: fixed; /* This is what makes columns equal width */
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+  background: white;
+  border: 1px solid rgba(11,18,32,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.schedule-table th, 
+.schedule-table td {
+  width: 16.66%; 
+  padding: 16px 8px;
+  text-align: center;
+  border-bottom: 1px solid rgba(11,18,32,0.06);
+  font-size: 13px;
+}
+
+.schedule-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: var(--blue);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* The Date Shift Badge (+1d / -1d) */
+.date-shift {
+  display: inline-block;
+  background: var(--ink);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-left: 4px;
+  font-weight: 800;
+}
+
+/* Highlighting the User's Local Detection Row */
+.local-row {
+  background-color: rgba(253, 181, 21, 0.08);
+  font-style: italic;
+}
+
 /* ---------------------------
    Inputs
 ---------------------------- */
@@ -416,6 +464,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
