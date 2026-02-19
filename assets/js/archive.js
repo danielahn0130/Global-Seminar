@@ -79,7 +79,7 @@ function convertToLocalTime(dateStr) {
     if (localDay > utcDay) shift = " (+1 day)";
     if (localDay < utcDay) shift = " (-1 day)";
 
-    return `Your time: ${eventDate.toLocaleTimeString([], options)}${shift}`;
+    return `${eventDate.toLocaleTimeString('en-US', options)}${shift}`;
 }
 
 function renderNextTalk(data) {
@@ -127,6 +127,7 @@ function renderNextTalk(data) {
 }
 
 loadArchive();
+
 
 
 
