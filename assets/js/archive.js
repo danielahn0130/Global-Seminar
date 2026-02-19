@@ -9,7 +9,7 @@ async function loadArchive() {
     const rows = text.split("\n").slice(1);
 
     const archive = rows.map(r => {
-      const cols = r.split(",");
+      const cols = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
       return {
         date: cols[0],
         speaker: cols[1],
@@ -56,4 +56,5 @@ if (next.status === "Live" && zoomBtn) {
 
 // This actually starts the whole process
 loadArchive();
+
 
