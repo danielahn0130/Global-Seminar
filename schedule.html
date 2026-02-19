@@ -122,7 +122,25 @@ schedule.forEach(s => {
     body.appendChild(row);
 });
 </script>
+  
+<script>
+  window.addEventListener('load', () => {
+    const tableBody = document.querySelector('tbody');
+    const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+    // Create a new row
+    const tr = document.createElement('tr');
+    tr.style.background = "var(--tint-gold)";
+    tr.innerHTML = `
+      <td><strong>Your Local Time</strong></td>
+      <td>—</td>
+      <td colspan="4" style="text-align: center; font-weight: bold;">
+        Atlantic: ${formatTime(17, userZone)} | Pacific: ${formatTime(4, userZone)}
+      </td>
+    `;
+    tableBody.appendChild(tr);
+  });
+</script>
 
   <section class="section">
     <div class="container">
@@ -171,6 +189,7 @@ schedule.forEach(s => {
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
