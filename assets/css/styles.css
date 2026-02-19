@@ -281,6 +281,30 @@ h1,h2,h3,h4,h5,h6,strong{
   color: var(--ink);
 }
 
+/* Session Badges */
+.session-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.badge-atlantic {
+  background: rgba(0, 50, 98, 0.1); /* Berkeley Blue tint */
+  color: var(--blue);
+  border: 1px solid var(--blue);
+}
+
+.badge-pacific {
+  background: rgba(253, 181, 21, 0.1); /* Berkeley Gold tint */
+  color: #856404; /* Darker gold for readability */
+  border: 1px solid var(--gold);
+}
+
 /* ---------------------------
    Sections (subtle tints)
 ---------------------------- */
@@ -392,6 +416,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
