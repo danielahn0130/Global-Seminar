@@ -134,65 +134,59 @@ sheetData.forEach(match => {
         marker.bindPopup(content);
     }
 });
-        // --- 5. SEARCH FUNCTIONALITY ---
+
+        // --- 6. SCOPED SEARCH LOGIC ---
+// Look for the search bar specifically within the current page context
 const searchInput = document.getElementById('mapSearch');
-if (searchInput) {
+const clearBtn = document.getElementById('clearSearch');
+const resultsDiv = document.getElementById('searchResults');
+
+if (searchInput && resultsDiv) {
+    // 1. Manage the Clear (X) Button visibility
     searchInput.addEventListener('input', (e) => {
+        if (clearBtn) clearBtn.style.display = e.target.value.length > 0 ? 'block' : 'none';
+        
         const query = e.target.value.toLowerCase().trim();
-        const resultsDiv = document.getElementById('searchResults');
-        resultsDiv.innerHTML = ''; // Clear old results
+        resultsDiv.innerHTML = ''; 
+        if (query.length < 2) return;
 
-        if (query.length < 2) return; // Don't search until 2 characters are typed
-
-        // Filter countries that match the search
+        // 2. Filter matches from the sheetData we fetched earlier
         const matches = sheetData.filter(d => d.Country.toLowerCase().includes(query));
 
         matches.forEach(match => {
-            const div = document.createElement('div');
-            div.style.padding = '10px';
-            div.style.cursor = 'pointer';
-            div.style.borderBottom = '1px solid #eee';
-            div.innerText = match.Country;
+            const item = document.createElement('div');
+            item.style.padding = '10px';
+            item.style.cursor = 'pointer';
+            item.style.borderBottom = '1px solid #eee';
+            item.innerText = match.Country;
 
-            div.onclick = () => {
-                // Find the layer on the map that matches this country
-                map.eachLayer(layer => {
-                    // Check if it's a GeoJSON shape or a Marker
-                    if (layer.feature && layer.feature.properties.name === match.Country) {
-                        map.fitBounds(layer.getBounds());
-                        layer.openPopup();
-                    } else if (layer.getLatLng && match.Lat) {
-                        // If it's a city-state marker
-                        if (layer.getLatLng().lat == match.Lat) {
-                            map.setView(layer.getLatLng(), 6);
-                            layer.openPopup();
-                        }
+            item.onclick = () => {
+                // Find the specific layer for this country
+                map.eachLayer(l => {
+                    const isShape = l.feature && l.feature.properties.name === match.Country;
+                    const isMarker = l.getLatLng && match.Lat && l.getLatLng().lat == match.Lat;
+
+                    if (isShape || isMarker) {
+                        (l.getBounds) ? map.fitBounds(l.getBounds()) : map.setView(l.getLatLng(), 6);
+                        l.openPopup();
                     }
                 });
                 resultsDiv.innerHTML = '';
                 searchInput.value = match.Country;
             };
-            resultsDiv.appendChild(div);
+            resultsDiv.appendChild(item);
         });
     });
-}
-        const searchInput = document.getElementById('mapSearch');
-const clearBtn = document.getElementById('clearSearch');
-const resultsDiv = document.getElementById('searchResults');
 
-if (searchInput && clearBtn) {
-    // Show/Hide X button based on input
-    searchInput.addEventListener('input', (e) => {
-        clearBtn.style.display = e.target.value.length > 0 ? 'block' : 'none';
-    });
-
-    // Clear function
-    clearBtn.onclick = () => {
-        searchInput.value = '';
-        resultsDiv.innerHTML = '';
-        clearBtn.style.display = 'none';
-        searchInput.focus();
-    };
+    // 3. Clear Button Click
+    if (clearBtn) {
+        clearBtn.onclick = () => {
+            searchInput.value = '';
+            resultsDiv.innerHTML = '';
+            clearBtn.style.display = 'none';
+            searchInput.focus();
+        };
+    }
 }
 
     } catch (error) {
