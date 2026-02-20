@@ -176,6 +176,24 @@ if (searchInput) {
         });
     });
 }
+        const searchInput = document.getElementById('mapSearch');
+const clearBtn = document.getElementById('clearSearch');
+const resultsDiv = document.getElementById('searchResults');
+
+if (searchInput && clearBtn) {
+    // Show/Hide X button based on input
+    searchInput.addEventListener('input', (e) => {
+        clearBtn.style.display = e.target.value.length > 0 ? 'block' : 'none';
+    });
+
+    // Clear function
+    clearBtn.onclick = () => {
+        searchInput.value = '';
+        resultsDiv.innerHTML = '';
+        clearBtn.style.display = 'none';
+        searchInput.focus();
+    };
+}
 
     } catch (error) {
         console.error("Error loading map data:", error);
