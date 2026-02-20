@@ -445,64 +445,117 @@ tbody tr:hover{
 }
 
 /* ---------------------------
-   Maps
+   Maps & Search Bar
 ---------------------------- */
-/* Styling for the Reset Button */
-.leaflet-control-reset {
-  background-color: #fff;
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-  font-size: 18px;
-  cursor: pointer;
-  border-bottom: 2px solid rgba(0,0,0,0.2);
-  display: block;
+
+/* Container for search to align with your content grid */
+.search-container {
+    max-width: 400px; /* Adjust this to match your card widths */
+    margin-bottom: 20px;
+    position: relative;
+    width: 100%;
 }
 
-.leaflet-control-reset:hover {
-  background-color: #f4f4f4;
-}
-.leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    padding: 5px;
-    border-bottom: 4px solid #003262; /* Adds a Berkeley Blue accent to the bottom */
-}
-#mapSearch:focus {
-    border-color: #FDB515; /* Berkeley Gold */
-    box-shadow: 0 0 0 0.2rem rgba(253, 181, 21, 0.25);
+/* The actual text input */
+#mapSearch {
+    width: 100%;
+    padding: 12px 15px;
+    padding-right: 40px; /* space for the 'X' button */
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    font-size: 14px;
     outline: none;
+    transition: all 0.2s ease;
+}
+
+#mapSearch:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(253, 181, 21, 0.15);
+}
+
+/* The Search Results Dropdown */
+#searchResults {
+    position: absolute;
+    width: 100%;
+    background: white;
+    z-index: 2000;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 25px var(--shadow);
+    margin-top: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
 }
 
 #searchResults div {
+    padding: 12px 16px;
+    font-size: 13px;
+    cursor: pointer;
     transition: background 0.2s ease;
+    border-bottom: 1px solid var(--border);
+}
+
+#searchResults div:last-child {
+    border-bottom: none;
 }
 
 #searchResults div:hover {
-    background-color: #f8f9fa;
-    color: #003262; /* Berkeley Blue */
-    font-weight: bold;
+    background-color: var(--tint-blue);
+    color: var(--blue);
+    font-weight: 600;
 }
+
+/* Clear (X) Button */
+#clearSearch {
+    transition: color 0.2s;
+}
+
 #clearSearch:hover {
-    color: #003262 !important; /* Berkeley Blue on hover */
+    color: var(--blue) !important;
+}
+
+/* Leaflet Customizations */
+.leaflet-control-reset {
+    background-color: #fff;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 18px;
+    cursor: pointer;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    display: block;
+}
+
+.leaflet-control-reset:hover {
+    background-color: #f4f4f4;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: var(--radius-lg);
+    padding: 5px;
+    border-bottom: 4px solid var(--blue);
+    box-shadow: 0 10px 30px var(--shadow);
 }
 
 /* ---------------------------
-   Inputs
+   Inputs (General)
 ---------------------------- */
-.input{
-  width:100%;
-  padding: 10px 12px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(11,18,32,0.12);
-  background: rgba(255,255,255,0.85);
-  color: var(--ink);
-  outline: none;
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
 }
 
-.input:focus{
-  border-color: rgba(0,50,98,0.35);
-  box-shadow: 0 0 0 4px rgba(0,50,98,0.10);
+.input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px var(--tint-blue);
 }
 
 /* ---------------------------
@@ -526,6 +579,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
