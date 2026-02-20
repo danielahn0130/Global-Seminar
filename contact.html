@@ -36,58 +36,61 @@
 </header>
 
 <main>
-  <section class="hero">
-    <div class="container">
-      <div class="kicker"><span class="dot"></span> Contact</div>
-      <h2>Get in touch.</h2>
-      <p>For the mailing list or general questions, email the Seminar Manager.</p>
-      <div class="cta">
-        <a class="btn gold" href="mailto:daniel.ahn@berkeley.edu">Email Daniel Ahn</a>
-        <a class="btn" href="https://berkeley.zoom.us/j/98901820849" target="_blank" rel="noopener">Join Zoom</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container grid two">
-      <div class="card">
-        <h3>Mailing list</h3>
-        <p class="meta">
-          Email <a href="mailto:daniel.ahn@berkeley.edu" style="text-decoration:underline; text-underline-offset:4px;">daniel.ahn@berkeley.edu</a>
-          to join.
-        </p>
-        <p class="small" style="margin-top:10px">
-          Subject suggestion: <strong>“Global Seminar mailing list”</strong>
-        </p>
-      </div>
-      <div class="card">
-        <h3>Speaker applications</h3>
-        <p class="meta">
-          Apply here:
-          <a href="https://forms.gle/G9JiDAZ6qeZUqNCC9" target="_blank" rel="noopener" style="text-decoration:underline; text-underline-offset:4px;">
-            Google Form
-          </a>
-        </p>
-      </div>
-    </div>
-  </section>
-<section>
-<div class="container mb-5">
-    <div class="row">
-        <div class="col-md-6 col-sm-12">
-            <div class="search-container" style="position: relative;">
-                <input type="text" id="mapSearch" class="form-control" placeholder="Search by country..."
-                       style="border-radius: 20px; border: 2px solid #eee; padding-left: 15px; padding-right: 35px;">
-                
-                <span id="clearSearch" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #ccc; display: none; font-weight: bold;">&times;</span>
-                
-                <div id="searchResults" style="position: absolute; width: 100%; background: white; z-index: 2000; border-radius: 0 0 8px 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);"></div>
-            </div>
-        </div>
-    </div>
-</div>
+<section class="hero">
   <div class="container">
-  <div id="repMap" style="height: 500px; border-radius: 8px; border: 1px solid #eee;"></div>
+    <div class="kicker"><span class="dot"></span> Contact & Support</div>
+    <h2>Connect with our network.</h2>
+    <p>
+      For administrative inquiries and mailing list subscriptions, contact the Seminar Manager. 
+      For regional engagement or local coordination, connect with your nearest representative.
+    </p>
+    <div class="cta">
+      <a class="btn gold" href="mailto:daniel.ahn@berkeley.edu">Email Seminar Manager</a>
+      <a class="btn" href="apply.html">Speaker Application</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container grid two">
+    <div class="card">
+      <h3>Mailing List</h3>
+      <p class="meta">
+        To receive monthly session links and technical updates, please email 
+        <a href="mailto:daniel.ahn@berkeley.edu" style="text-decoration:underline; text-underline-offset:4px;">daniel.ahn@berkeley.edu</a>.
+      </p>
+      <p class="small" style="margin-top:10px">
+        Subject suggestion: <strong>“Global Seminar Mailing List”</strong>
+      </p>
+    </div>
+    <div class="card">
+      <h3>Regional Coordination</h3>
+      <p class="meta">
+        Our Regional Representatives serve as community bridges in their respective areas.
+      </p>
+      <p class="small" style="margin-top:10px">
+        Use the map below to find a representative in your region for localized inquiries or research engagement.
+      </p>
+    </div>
+  </div>
+</section>
+  
+<section class="section">
+  <div class="container" style="margin-bottom: 24px;">
+    <h3>Regional Liaison Map</h3>
+    <p class="meta">Find a local contact to learn more about session involvement or to coordinate within your local research network.</p>
+  </div>
+
+  <div class="container">
+      <div class="search-container" style="margin-bottom: 20px;">
+          <input type="text" id="mapSearch" placeholder="Search by country or region...">
+          <span id="clearSearch" style="display: none;">&times;</span>
+          <div id="searchResults"></div>
+      </div>
+  </div>
+
+  <div class="container">
+    <div id="repMap" style="height: 500px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);"></div>
   </div>
 </section>
 </main>
@@ -99,6 +102,7 @@
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
