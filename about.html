@@ -70,6 +70,20 @@
       </div>
     </div>
   </section>
+  <div class="container mt-4 mb-3">
+    <div class="row">
+        <div class="col-md-4 col-sm-6">
+            <div class="search-container" style="position: relative;">
+                <input type="text" id="mapSearch" class="form-control" placeholder="🔍 Search by country..." 
+                       style="border-radius: 20px; border: 2px solid #eee; padding-left: 15px; padding-right: 35px;">
+                
+                <span id="clearSearch" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #ccc; display: none; font-weight: bold;">&times;</span>
+                
+                <div id="searchResults" style="position: absolute; width: 100%; background: white; z-index: 2000; border-radius: 0 0 8px 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);"></div>
+            </div>
+        </div>
+    </div>
+</div>
   <div id="communityMap" style="height: 500px;"></div>
 </main>
 
@@ -80,6 +94,7 @@
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
