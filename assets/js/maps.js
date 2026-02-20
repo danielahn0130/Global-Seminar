@@ -55,28 +55,33 @@ map.addControl(new resetControl());
             
             let color = 'transparent';
             let opacity = 0;
+            let weight = 0;
 
-            if (type === 'rep') {
-                // Tint only if a Representative Name exists
-                if (match && match.Name && match.Name.trim() !== "") {
-                    color = '#003262'; // Berkeley Blue
-                    opacity = 0.7;
+            if (match) {
+                if (type === 'rep') {
+            // ONLY tint if there is a Representative Name assigned
+                if (match.Name && match.Name.trim() !== "") {
+                color = '#003262'; // Berkeley Blue
+                op = 0.7;
+                weight = 1;
                 }
-            } else {
-                // Gradient for Community Map
-                if (match && parseInt(match.Count) > 0) {
-                    const weight = match.Count / maxCount;
-                    color = '#FDB515'; // Berkeley Gold
-                    opacity = 0.2 + (weight * 0.7); // Ranges from 0.2 to 0.9
+                } else if (type === 'community') {
+            // Community map tints if count is greater than 0
+                const count = parseInt(match.Count) || 0;
+                if (count > 0) {
+                color = '#FDB515'; // Berkeley Gold
+                op = 0.2 + (count / maxCount * 0.7);
+                weight = 1;
+                    }
                 }
             }
-            return {
-                fillColor: match ? (type === 'rep' ? '#003262' : '#FDB515') : 'transparent',
-                weight: 1,
-                opacity: 1,
-                color: match ? '#fff' : 'transparent',
-                fillOpacity: 0.7
-            };
+
+    return {
+        fillColor: color,
+        fillOpacity: op,
+        color: '#fff', // Border color
+        weight: weight  // Border width (0 if no data, 1 if data)
+    };
         }
 
         // 3. Interaction & Popups
