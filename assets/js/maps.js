@@ -62,7 +62,7 @@ map.addControl(new resetControl());
             // ONLY tint if there is a Representative Name assigned
                 if (match.Name && match.Name.trim() !== "") {
                 color = '#003262'; // Berkeley Blue
-                op = 0.7;
+                opacity = 0.7;
                 weight = 1;
                 }
                 } else if (type === 'community') {
@@ -70,7 +70,7 @@ map.addControl(new resetControl());
                 const count = parseInt(match.Count) || 0;
                 if (count > 0) {
                 color = '#FDB515'; // Berkeley Gold
-                op = 0.2 + (count / maxCount * 0.7);
+                opacity = 0.2 + (count / maxCount * 0.7);
                 weight = 1;
                     }
                 }
@@ -78,7 +78,7 @@ map.addControl(new resetControl());
 
     return {
         fillColor: color,
-        fillOpacity: op,
+        fillOpacity: opacity,
         color: '#fff', // Border color
         weight: weight  // Border width (0 if no data, 1 if data)
     };
