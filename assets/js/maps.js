@@ -4,13 +4,18 @@ const BASE_URL = "https://script.google.com/macros/s/AKfycbxkNDxrHliV-PZW8RTBTk6
 
 async function initMap(type, elementId) {
     const map = L.map(elementId, { 
-        scrollWheelZoom: false,
+        scrollWheelZoom: false,        // Enables mouse wheel & trackpad scroll
+        touchZoom: true,              // Enables pinch-to-zoom on mobile/trackpads
+        tap: true,                    // Better mobile interaction
         attributionControl: false 
     }).setView([20, 10], 2);
-
     // Light, clean base layer
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-
+// --- ZOOM CONTROL LOGIC ---
+// Enable scroll zoom when the user clicks into the map
+map.on('focus', () => {map.scrollWheelZoom.enable();});
+// Disable it again when the user clicks away (blurs)
+map.on('blur', () => {map.scrollWheelZoom.disable();});
     const sheetTab = (type === 'rep') ? 'RepData' : 'CommunityData';
     const fetchUrl = `${BASE_URL}?sheet=${sheetTab}`;
 // --- 0. CUSTOM RESET BUTTON ---
@@ -129,12 +134,66 @@ sheetData.forEach(match => {
         marker.bindPopup(content);
     }
 });
+        // --- 5. SEARCH FUNCTIONALITY ---
+const searchInput = document.getElementById('mapSearch');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const resultsDiv = document.getElementById('searchResults');
+        resultsDiv.innerHTML = ''; // Clear old results
+
+        if (query.length < 2) return; // Don't search until 2 characters are typed
+
+        // Filter countries that match the search
+        const matches = sheetData.filter(d => d.Country.toLowerCase().includes(query));
+
+        matches.forEach(match => {
+            const div = document.createElement('div');
+            div.style.padding = '10px';
+            div.style.cursor = 'pointer';
+            div.style.borderBottom = '1px solid #eee';
+            div.innerText = match.Country;
+
+            div.onclick = () => {
+                // Find the layer on the map that matches this country
+                map.eachLayer(layer => {
+                    // Check if it's a GeoJSON shape or a Marker
+                    if (layer.feature && layer.feature.properties.name === match.Country) {
+                        map.fitBounds(layer.getBounds());
+                        layer.openPopup();
+                    } else if (layer.getLatLng && match.Lat) {
+                        // If it's a city-state marker
+                        if (layer.getLatLng().lat == match.Lat) {
+                            map.setView(layer.getLatLng(), 6);
+                            layer.openPopup();
+                        }
+                    }
+                });
+                resultsDiv.innerHTML = '';
+                searchInput.value = match.Country;
+            };
+            resultsDiv.appendChild(div);
+        });
+    });
+}
 
     } catch (error) {
         console.error("Error loading map data:", error);
     }
 }
-
+// --- GLOBAL SEARCH CLEANUP ---
+document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") {
+        const results = document.getElementById('searchResults');
+        const searchInput = document.getElementById('mapSearch');
+        
+        if (results) results.innerHTML = '';
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.blur(); // Removes focus from the input box
+        }
+    }
+});
 // Initialize based on which div is found on the page
 if (document.getElementById('communityMap')) initMap('community', 'communityMap');
 if (document.getElementById('repMap')) initMap('rep', 'repMap');
