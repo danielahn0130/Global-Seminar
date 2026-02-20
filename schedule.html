@@ -35,23 +35,24 @@
 <main>
   <section class="hero">
     <div class="container">
-      <div class="kicker"><span class="dot"></span> Schedule</div>
-      <h2>First Monday of every month (Zoom).</h2>
+      <div class="kicker"><span class="dot"></span> Global Calendar</div>
+      <h2>Coordinated for every time zone.</h2>
       <p>
-        To accommodate more time zones, we are planning to expand to two sessions per month (first and third Monday).
+        To ensure worldwide participation, the Global Seminar holds two sessions per month. 
+        Our "Atlantic" and "Pacific" corridors are scheduled to provide accessible viewing hours 
+        for researchers in all major geographical regions.
       </p>
       <div class="cta">
         <a class="btn primary" href="https://berkeley.zoom.us/j/98901820849" target="_blank" rel="noopener">Join on Zoom</a>
-        <a class="btn gold" href="apply.html">Apply to speak</a>
+        <a class="btn gold" href="apply.html">Apply to Speak</a>
       </div>
     </div>
-  </section>
+</section>
 
 <section class="section">
   <div class="container">
-    <h3>Global Corridor Guide</h3>
-    <p class="meta">Times automatically adjust for current Daylight Saving (DST) offsets.</p>
-    
+    <h3>Regional Time Conversion</h3>
+    <p class="meta"> The table below provides a reference for our primary corridors. Times are automatically adjusted for your local Daylight Saving Time (DST) offsets.</p>
     <div class="tablewrap">
       <table id="timeTable" style="table-layout: fixed; width: 100%;">
         <thead>
@@ -141,13 +142,16 @@ schedule.forEach(s => {
 
   <section class="section">
   <div class="container">
-    <h3>Upcoming Sessions</h3>
-    <p class="meta">Add the full series to your calendar to receive automatic updates and reminders.</p>
-    
-    <div class="calendar-wrapper" style="margin-top: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd;">
+    <h3>Seminar Calendar</h3>
+    <p class="meta">Stay updated by subscribing to our series. You can add individual sessions to your personal calendar or subscribe to the full schedule using the button below.</p>
+    <div class="calendar-wrapper" style="margin-top: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
       <iframe src="https://calendar.google.com/calendar/embed?src=c_80fb209c7e7a4b6590557c0c603ea6f128e5ff958bc9239adc2b13d1d1130232%40group.calendar.google.com&ctz=UTC" 
-        style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+        style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
     </div>
+    <p class="small" style="margin-top:15px; text-align: right;">
+      <a href="https://calendar.google.com/calendar/render?cid=c_80fb209c7e7a4b6590557c0c603ea6f128e5ff958bc9239adc2b13d1d1130232%40group.calendar.google.com" 
+         target="_blank" class="btn" style="padding: 5px 15px; font-size: 12px;">+ Add to Google Calendar</a>
+    </p>
   </div>
 </section>
 </main>
@@ -159,6 +163,7 @@ schedule.forEach(s => {
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
