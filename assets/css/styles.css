@@ -445,6 +445,31 @@ tbody tr:hover{
 }
 
 /* ---------------------------
+   Maps
+---------------------------- */
+/* Styling for the Reset Button */
+.leaflet-control-reset {
+  background-color: #fff;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  font-size: 18px;
+  cursor: pointer;
+  border-bottom: 2px solid rgba(0,0,0,0.2);
+  display: block;
+}
+
+.leaflet-control-reset:hover {
+  background-color: #f4f4f4;
+}
+.leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    padding: 5px;
+    border-bottom: 4px solid #003262; /* Adds a Berkeley Blue accent to the bottom */
+}
+
+/* ---------------------------
    Inputs
 ---------------------------- */
 .input{
@@ -483,6 +508,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
