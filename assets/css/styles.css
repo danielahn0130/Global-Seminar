@@ -451,7 +451,7 @@ tbody tr:hover{
 /* Container for search to align with your content grid */
 .search-container {
     max-width: 400px; /* Adjust this to match your card widths */
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     position: relative;
     width: 100%;
 }
@@ -467,6 +467,7 @@ tbody tr:hover{
     font-size: 14px;
     outline: none;
     transition: all 0.2s ease;
+    display: block;
 }
 
 #mapSearch:focus {
@@ -477,7 +478,8 @@ tbody tr:hover{
 /* The Search Results Dropdown */
 #searchResults {
     position: absolute;
-    width: 100%;
+    left: 0;
+    right: 0; /* Aligning left/right to 0 within a 400px parent locks the width */
     background: white;
     z-index: 2000;
     border-radius: var(--radius-lg);
@@ -508,7 +510,14 @@ tbody tr:hover{
 
 /* Clear (X) Button */
 #clearSearch {
-    transition: color 0.2s;
+    position: absolute;
+    right: 15px; /* Fixed distance from the right edge of the 400px container */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #ccc;
+    font-size: 20px;
+    z-index: 5; /* Ensure it stays above the input field */
 }
 
 #clearSearch:hover {
@@ -579,6 +588,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
