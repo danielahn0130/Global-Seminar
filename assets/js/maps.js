@@ -13,7 +13,22 @@ async function initMap(type, elementId) {
 
     const sheetTab = (type === 'rep') ? 'RepData' : 'CommunityData';
     const fetchUrl = `${BASE_URL}?sheet=${sheetTab}`;
+// --- 0. CUSTOM RESET BUTTON ---
+const resetControl = L.Control.extend({
+    options: { position: 'topleft' }, // Places it right under the +/- buttons
+    onAdd: function (map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        const button = L.DomUtil.create('a', 'leaflet-control-reset', container);
+        button.innerHTML = '🏠'; // Home icon
+        button.title = 'Reset Map View';
 
+        button.onclick = function() {
+            map.setView([20, 10], 2); // Snaps back to the original world view
+        };
+        return container;
+    }
+});
+map.addControl(new resetControl());
     try {
         // 1. Fetch both Google Sheet data and GeoJSON outlines simultaneously
         const [sheetResponse, geoResponse] = await Promise.all([
@@ -23,14 +38,33 @@ async function initMap(type, elementId) {
 
         const sheetData = await sheetResponse.json();
         const geoData = await geoResponse.json();
-// --- ADD THIS LINE TEMPORARILY ---
-console.log("Map Country Names:", geoData.features.map(f => f.properties.name).sort());
-// ---------------------------------
+
+        // --- 1.5 GRADIENT CALCULATION (for Community Map) ---
+        const counts = sheetData.map(d => parseInt(d.Count) || 0);
+        const maxCount = Math.max(...counts, 1); // Avoid division by zero
+        
         // 2. Define the Tinting Style
         function getStyle(feature) {
             const countryName = feature.properties.name;
             const match = sheetData.find(d => d.Country === countryName);
             
+            let color = 'transparent';
+            let opacity = 0;
+
+            if (type === 'rep') {
+                // Tint only if a Representative Name exists
+                if (match && match.Name && match.Name.trim() !== "") {
+                    color = '#003262'; // Berkeley Blue
+                    opacity = 0.7;
+                }
+            } else {
+                // Gradient for Community Map
+                if (match && parseInt(match.Count) > 0) {
+                    const weight = match.Count / maxCount;
+                    color = '#FDB515'; // Berkeley Gold
+                    opacity = 0.2 + (weight * 0.7); // Ranges from 0.2 to 0.9
+                }
+            }
             return {
                 fillColor: match ? (type === 'rep' ? '#003262' : '#FDB515') : 'transparent',
                 weight: 1,
@@ -44,11 +78,9 @@ console.log("Map Country Names:", geoData.features.map(f => f.properties.name).s
         L.geoJson(geoData, {
             style: getStyle,
             onEachFeature: (feature, layer) => {
-                const countryName = feature.properties.name;
-                const match = sheetData.find(d => d.Country === countryName);
-
-                if (match) {
-                    let content = `<strong>${countryName}</strong>`;
+                const match = sheetData.find(d => d.Country === feature.properties.name);
+                if (match && (type === 'community' || (match.Name && match.Name.trim() !== ""))) {
+                    let content = `<strong>${feature.properties.name}</strong>`;
                     if (type === 'rep') {
                         content = `
                             <div style="text-align:center; min-width:150px;">
@@ -61,12 +93,42 @@ console.log("Map Country Names:", geoData.features.map(f => f.properties.name).s
                         content += `<br>${match.Count} Participants`;
                     }
                     layer.bindPopup(content);
-                    
-                    layer.on('mouseover', () => layer.setStyle({ fillOpacity: 0.9 }));
-                    layer.on('mouseout', () => layer.setStyle({ fillOpacity: 0.7 }));
                 }
             }
         }).addTo(map);
+// --- 4. UNIVERSAL MARKER FALLBACK (For Singapore, HK, etc.) ---
+sheetData.forEach(match => {
+    // Only proceed if Lat and Long are provided in the sheet
+    if (match.Lat && match.Long) {
+        
+        // 1. Determine color and content based on map type
+        const markerColor = (type === 'rep') ? '#003262' : '#FDB515';
+        let content = `<strong>${match.Country}</strong>`;
+
+        if (type === 'rep' && match.Name) {
+            content = `
+                <div style="text-align:center; min-width:150px;">
+                    <img src="${match.PhotoURL}" style="width:60px; height:60px; border-radius:50%; object-fit:cover; margin-bottom:8px; border:1px solid #ddd;">
+                    <br><strong>${match.Name}</strong><br>
+                    <small>${match.Institution}</small><br>
+                    <a href="mailto:${match.Email}" style="color:#003262; font-size:11px;">${match.Email}</a>
+                </div>`;
+        } else if (type === 'community' && match.Count) {
+            content += `<br>${match.Count} Participants`;
+        }
+
+        // 2. Create and add the marker to the map
+        const marker = L.circleMarker([match.Lat, match.Long], {
+            radius: (type === 'rep') ? 6 : 5, // Rep markers slightly larger
+            fillColor: markerColor,
+            color: '#fff',
+            weight: 1,
+            fillOpacity: 1
+        }).addTo(map);
+
+        marker.bindPopup(content);
+    }
+});
 
     } catch (error) {
         console.error("Error loading map data:", error);
