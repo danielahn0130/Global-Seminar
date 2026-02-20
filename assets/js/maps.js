@@ -23,7 +23,9 @@ async function initMap(type, elementId) {
 
         const sheetData = await sheetResponse.json();
         const geoData = await geoResponse.json();
-
+// --- ADD THIS LINE TEMPORARILY ---
+console.log("Map Country Names:", geoData.features.map(f => f.properties.name).sort());
+// ---------------------------------
         // 2. Define the Tinting Style
         function getStyle(feature) {
             const countryName = feature.properties.name;
