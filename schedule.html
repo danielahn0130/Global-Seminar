@@ -123,21 +123,22 @@ schedule.forEach(s => {
     body.appendChild(row);
 });
 
-//Your time code
+// Enhanced Local Time Row
     const tableBody = document.querySelector('tbody');
     const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    // Create a new row
-    const tr = document.createElement('tr');
-    tr.style.background = "var(--tint-gold)";
-    tr.innerHTML = `
+    
+    const localRow = document.createElement('tr');
+    localRow.style.background = "rgba(253, 181, 21, 0.1)"; // Subtle Berkeley Gold tint
+    localRow.innerHTML = `
       <td><strong>Your Local Time</strong></td>
       <td>—</td>
-      <td colspan="4" style="text-align: center; font-weight: bold;">
-        Atlantic: ${formatTime(17, userZone)} | Pacific: ${formatTime(4, userZone)}
+      <td colspan="4" style="text-align: center;">
+        <strong>Atlantic:</strong> ${formatTime(17, userZone)} &nbsp; | &nbsp; 
+        <strong>Pacific:</strong> ${formatTime(4, userZone)}
+        <br><small style="opacity: 0.7;">(Detected Zone: ${userZone.replace('_', ' ')})</small>
       </td>
     `;
-    tableBody.appendChild(tr);
+tableBody.appendChild(localRow);
 </script>
 
   <section class="section">
@@ -163,6 +164,7 @@ schedule.forEach(s => {
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
