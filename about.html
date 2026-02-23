@@ -75,41 +75,39 @@
 <section class="section" style="background-color: var(--tint-blue);">
   <div class="container">
     <div class="grid three" style="text-align: center;">
-      
       <div class="stat-box">
         <span class="stat-number">34</span>
         <span class="stat-label">Countries</span>
       </div>
-
       <div class="stat-box">
         <span class="stat-number">150+</span>
         <span class="stat-label">Institutions</span>
       </div>
-
       <div class="stat-box">
         <span class="stat-number">45+</span>
         <span class="stat-label">Presentations</span>
       </div>
-
     </div>
   </div>
 </section>
 
 <script>
-  // This function animates the numbers when the page loads
   const stats = document.querySelectorAll('.stat-number');
   stats.forEach(stat => {
+    // We store whether the original text had a '+' before we start animating
+    const hasPlus = stat.innerText.includes('+');
     const target = parseInt(stat.innerText);
     let current = 0;
-    const increment = target / 30; // Speed of the count-up
+    const increment = target / 30;
     
     const updateCount = () => {
       if (current < target) {
         current += increment;
-        stat.innerText = Math.ceil(current) + (stat.innerText.includes('+') ? '+' : '');
+        // We use the 'hasPlus' variable to decide whether to add the '+' back
+        stat.innerText = Math.ceil(current) + (hasPlus ? '+' : '');
         setTimeout(updateCount, 40);
       } else {
-        stat.innerText = target + (stat.innerText.includes('+') ? '+' : '');
+        stat.innerText = target + (hasPlus ? '+' : '');
       }
     };
     updateCount();
@@ -141,6 +139,7 @@
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
