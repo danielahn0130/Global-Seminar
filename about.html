@@ -71,6 +71,50 @@
     </div>
   </div>
 </section>
+
+<section class="section" style="background-color: var(--tint-blue);">
+  <div class="container">
+    <div class="grid three" style="text-align: center;">
+      
+      <div class="stat-box">
+        <span class="stat-number">34</span>
+        <span class="stat-label">Countries</span>
+      </div>
+
+      <div class="stat-box">
+        <span class="stat-number">150+</span>
+        <span class="stat-label">Institutions</span>
+      </div>
+
+      <div class="stat-box">
+        <span class="stat-number">45+</span>
+        <span class="stat-label">Presentations</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  // This function animates the numbers when the page loads
+  const stats = document.querySelectorAll('.stat-number');
+  stats.forEach(stat => {
+    const target = parseInt(stat.innerText);
+    let current = 0;
+    const increment = target / 30; // Speed of the count-up
+    
+    const updateCount = () => {
+      if (current < target) {
+        current += increment;
+        stat.innerText = Math.ceil(current) + (stat.innerText.includes('+') ? '+' : '');
+        setTimeout(updateCount, 40);
+      } else {
+        stat.innerText = target + (stat.innerText.includes('+') ? '+' : '');
+      }
+    };
+    updateCount();
+  });
+</script>
   
 <section class="section">
   <div class="container" style="margin-bottom: 24px;">
@@ -97,6 +141,7 @@
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
