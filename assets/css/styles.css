@@ -305,6 +305,33 @@ h1,h2,h3,h4,h5,h6,strong{
   border: 1px solid var(--gold);
 }
 
+.stat-box {
+  padding: 20px;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+/* For the subtle background tint if not already defined */
+:root {
+  --tint-blue: rgba(0, 50, 98, 0.03);
+}
+
 /* ---------------------------
    Sections (subtle tints)
 ---------------------------- */
@@ -588,6 +615,7 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
+
 
 
 
