@@ -48,34 +48,56 @@
         <a class="btn primary" href="https://berkeley.zoom.us/j/98901820849" target="_blank" rel="noopener">Join on Zoom</a>
         <a class="btn gold" href="apply.html">Apply to Speak</a>
       </div>
-    </div>
-</section>
+    </div> </section>
 
-<section class="section">
-  <div class="container">
-    <h3>Regional Time Conversion</h3>
-    <p class="meta"> The table below provides a reference for our primary corridors. Times are automatically adjusted for your local Daylight Saving Time (DST) offsets.</p>
-    <div class="tablewrap">
-      <table id="timeTable" style="table-layout: fixed; width: 100%;">
-        <thead>
-          <tr>
-            <th style="width: 20%;">Corridor</th>
-            <th style="width: 16%;">UTC</th>
-            <th style="width: 16%;">America (PT)</th>
-            <th style="width: 16%;">Eur/Afr (CET)</th>
-            <th style="width: 16%;">Gulf (GST)</th>
-            <th style="width: 16%;">Asia-Pac (CST)</th>
-          </tr>
-        </thead>
-        <tbody id="scheduleBody">
-          </tbody>
-      </table>
-    </div>
-    <p class="small" style="margin-top:10px">*Note: Depending on your location, the talk may fall on the Sunday evening or Tuesday morning relative to UTC Monday.</p>
-  </div>
-</section>
+  <style>
+    /* Essential styles for this page's dynamic content */
+    .date-shift {
+      font-size: 0.75rem;
+      vertical-align: super;
+      color: var(--gold);
+      font-weight: bold;
+      margin-left: 2px;
+    }
+    .tablewrap {
+      overflow-x: auto; /* Enables swiping on mobile */
+      -webkit-overflow-scrolling: touch;
+      margin-top: 20px;
+      border: 1px solid var(--border, #eee);
+      border-radius: 8px;
+    }
+    #timeTable th, #timeTable td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border, #eee);
+    }
+  </style>
 
-<script>
+  <section class="section">
+    <div class="container">
+      <h3>Regional Time Conversion</h3>
+      <p class="meta">Times below adjust automatically for your local Daylight Saving Time (DST) offsets.</p>
+      
+      <div class="tablewrap">
+        <table id="timeTable" style="width: 100%; min-width: 800px; border-collapse: collapse;">
+          <thead>
+            <tr style="background: var(--tint-blue, #f8f9fa);">
+              <th style="text-align: left;">Corridor</th>
+              <th>UTC</th>
+              <th>America (PT)</th>
+              <th>Eur/Afr (CET)</th>
+              <th>Gulf (GST)</th>
+              <th>Asia-Pac (CST)</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody">
+            </tbody>
+        </table>
+      </div>
+      <p class="small" style="margin-top:10px; opacity: 0.8;">*Note: Depending on your location, the talk may fall on Sunday evening or Tuesday morning relative to UTC Monday.</p>
+    </div>
+  </section>
+
+  <script>
 function formatTime(utcHour, targetTimeZone) {
     const now = new Date();
     // Create a date object set to the correct UTC hour
@@ -141,24 +163,26 @@ schedule.forEach(s => {
       </td>
     `;
 tableBody.appendChild(localRow);
-</script>
+  </script>
 
   <section class="section">
-  <div class="container">
-    <h3>Seminar Calendar</h3>
-    <p class="meta">Stay updated by subscribing to our series. You can add individual sessions to your personal calendar or subscribe to the full schedule using the button below.</p>
-    <div class="calendar-wrapper" style="margin-top: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-      <iframe src="https://calendar.google.com/calendar/embed?src=c_80fb209c7e7a4b6590557c0c603ea6f128e5ff958bc9239adc2b13d1d1130232%40group.calendar.google.com&ctz=UTC" 
-        style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+    <div class="container">
+      <h3>Seminar Calendar</h3>
+      <p class="meta">Subscribe to our series to add individual sessions to your personal calendar automatically.</p>
+      
+      <div class="calendar-wrapper" style="margin-top: 24px; border-radius: 12px; overflow: hidden; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <iframe src="https://calendar.google.com/calendar/embed?src=c_80fb209c7e7a4b6590557c0c603ea6f128e5ff958bc9239adc2b13d1d1130232%40group.calendar.google.com&ctz=UTC" 
+          style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+      </div>
+      
+      <div style="margin-top:15px; text-align: right;">
+        <a href="https://calendar.google.com/calendar/render?cid=c_80fb209c7e7a4b6590557c0c603ea6f128e5ff958bc9239adc2b13d1d1130232%40group.calendar.google.com" 
+           target="_blank" class="btn primary" style="font-size: 13px;">+ Add to Google Calendar</a>
+      </div>
     </div>
-    <p class="small" style="margin-top:15px; text-align: right;">
-      <a href="https://calendar.google.com/calendar/render?cid=c_80fb209c7e7a4b6590557c0c603ea6f128e5ff958bc9239adc2b13d1d1130232%40group.calendar.google.com" 
-         target="_blank" class="btn" style="padding: 5px 15px; font-size: 12px;">+ Add to Google Calendar</a>
-    </p>
-  </div>
-</section>
+  </section>
 </main>
-
+  
 <footer class="container footer">
   © <span data-year></span> Global Seminar · Reticular Chemistry
 </footer>
@@ -166,6 +190,7 @@ tableBody.appendChild(localRow);
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
