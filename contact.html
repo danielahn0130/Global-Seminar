@@ -36,7 +36,6 @@
     <a href="contact.html" data-nav="contact.html">Contact</a>
   </div>
 </header>
-
 <main>
 <section class="hero">
   <div class="container">
@@ -80,23 +79,20 @@
 <section class="section">
   <div class="container" style="margin-bottom: 24px;">
     <h3>Regional Representative Map</h3>
-    <p class="meta">Find a local contact to learn more about session involvement or to coordinate within your local research network.</p>
+    <p class="meta">Find a local contact to coordinate within your research network.</p>
   </div>
 
   <div class="container">
-      <div class="search-container" style="margin-bottom: 20px;">
+      <div class="search-container" style="margin-bottom: 20px; position: relative;">
           <input type="text" id="mapSearch" placeholder="Search by country or region...">
           <span id="clearSearch" style="display: none;">&times;</span>
-          <div id="searchResults"></div>
+          <div id="searchResults" style="position: absolute; width: 100%; z-index: 1000;"></div>
       </div>
-  </div>
-
-  <div class="container">
-    <div id="repMap" style="height: 500px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);"></div>
+      
+      <div id="repMap" style="height: 500px; border-radius: 12px; border: 1px solid #eee; border: 1px solid var(--border, #eee); box-shadow: 0 4px 12px rgba(0,0,0,0.05);"></div>
   </div>
 </section>
 </main>
-
 <footer class="container footer">
   © <span data-year></span> Global Seminar · Reticular Chemistry
 </footer>
@@ -104,6 +100,7 @@
 <script src="assets/js/site.js"></script>
 </body>
 </html>
+
 
 
 
