@@ -631,7 +631,7 @@ tbody tr:hover{
 
 /* ---------------------------
    Responsive
----------------------------- */
+---------------------------- *//
 @media (max-width: 900px){
   .grid.two{ grid-template-columns: 1fr; }
 }
