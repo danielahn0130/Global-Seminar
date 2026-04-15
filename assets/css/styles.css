@@ -192,7 +192,7 @@ h1,h2,h3,h4,h5,h6,strong{
   z-index: -1; /* Places image behind text */
   
   /* Replace with your actual image path */
-  background-image: url('assets/banner2.png'); 
+  background-image: url('../banner2.png'); 
   background-size: cover;
   background-position: center;
   
