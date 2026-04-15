@@ -197,7 +197,7 @@ h1,h2,h3,h4,h5,h6,strong{
   background-position: center;
   
   /* ADJUST TRANSPARENCY HERE (0.0 to 1.0) */
-  opacity: 0.15; 
+  opacity: 0.5; 
 }
 
 /* Ensure hero content stays above the pseudo-element */
