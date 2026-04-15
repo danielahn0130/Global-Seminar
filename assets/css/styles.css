@@ -176,8 +176,34 @@ h1,h2,h3,h4,h5,h6,strong{
 /* ---------------------------
    Hero
 ---------------------------- */
-.hero{
+.hero {
+  position: relative; /* Required for absolute positioning of pseudo-element */
   padding: 56px 0 26px;
+  overflow: hidden;   /* Keeps the background from leaking out */
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  z-index: -1; /* Places image behind text */
+  
+  /* Replace with your actual image path */
+  background-image: url('assets/banner2.png'); 
+  background-size: cover;
+  background-position: center;
+  
+  /* ADJUST TRANSPARENCY HERE (0.0 to 1.0) */
+  opacity: 0.15; 
+}
+
+/* Ensure hero content stays above the pseudo-element */
+.hero .container {
+  position: relative;
+  z-index: 1;
 }
 
 .kicker{
