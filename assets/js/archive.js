@@ -104,10 +104,10 @@ function renderNextTalk(data) {
   badge.className = "session-badge";
   
   if (day <= 14) {
-    badge.innerText = "Session A";
+    badge.innerText = "Session A: 17:00 UTC";
     badge.classList.add("badge-atlantic");
   } else {
-    badge.innerText = "Session B";
+    badge.innerText = "Session B: 04:00 UTC";
     badge.classList.add("badge-pacific");
   }
 
