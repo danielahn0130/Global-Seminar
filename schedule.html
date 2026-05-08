@@ -122,8 +122,8 @@ function formatTime(utcHour, targetTimeZone) {
 }
 
 const schedule = [
-    { name: "Atlantic", utc: 17 },
-    { name: "Pacific", utc: 4 }
+    { name: "Session A", utc: 17 },
+    { name: "Session B", utc: 4 }
 ];
 
 const zones = [
@@ -156,8 +156,8 @@ schedule.forEach(s => {
       <td><strong>Your Local Time</strong></td>
       <td>—</td>
       <td colspan="4" style="text-align: center;">
-        <strong>Atlantic:</strong> ${formatTime(17, userZone)} &nbsp; | &nbsp; 
-        <strong>Pacific:</strong> ${formatTime(4, userZone)}
+        <strong>Session A:</strong> ${formatTime(17, userZone)} &nbsp; | &nbsp; 
+        <strong>Session B:</strong> ${formatTime(4, userZone)}
         <br><small style="opacity: 0.7;">(Detected Zone: ${userZone.replace('_', ' ')})</small>
       </td>
     `;
