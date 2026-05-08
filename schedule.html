@@ -40,8 +40,7 @@
       <div class="kicker"><span class="dot"></span> Global Calendar</div>
       <h2>Seminar Calendar and Time Zones</h2>
       <p>
-        To ensure worldwide participation, the Global Seminar holds two sessions per month. 
-        Our "Atlantic" and "Pacific" corridors are scheduled to provide accessible viewing hours 
+        To ensure worldwide participation, the Global Seminar holds two sessions per month scheduled to provide accessible viewing hours 
         for researchers in all major geographical regions.
       </p>
       <div class="cta">
@@ -81,7 +80,7 @@
         <table id="timeTable" style="width: 100%; min-width: 800px; border-collapse: collapse;">
           <thead>
             <tr style="background: var(--tint-blue, #f8f9fa);">
-              <th style="text-align: left;">Corridor</th>
+              <th style="text-align: left;">Session</th>
               <th>UTC</th>
               <th>America (PT)</th>
               <th>Eur/Afr (CET)</th>
@@ -123,8 +122,8 @@ function formatTime(utcHour, targetTimeZone) {
 }
 
 const schedule = [
-    { name: "Atlantic", utc: 17 },
-    { name: "Pacific", utc: 4 }
+    { name: "Session A", utc: 17 },
+    { name: "Session B", utc: 4 }
 ];
 
 const zones = [
