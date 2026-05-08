@@ -104,10 +104,10 @@ function renderNextTalk(data) {
   badge.className = "session-badge";
   
   if (day <= 14) {
-    badge.innerText = "Session A: Atlantic Corridor";
+    badge.innerText = "Session A";
     badge.classList.add("badge-atlantic");
   } else {
-    badge.innerText = "Session B: Pacific Corridor";
+    badge.innerText = "Session B";
     badge.classList.add("badge-pacific");
   }
 
