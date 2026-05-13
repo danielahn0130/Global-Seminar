@@ -397,11 +397,10 @@ table{
   width:100%;
   border-collapse:collapse;
   min-width:760px;
-   table-layout: fixed; /* ADD THIS: Forces columns to respect widths */
 }
 
 thead th{
-  text-align: center;
+  text-align:left;
   padding: 12px 14px;
   font-size: 12px;
   color: var(--ink);
@@ -412,15 +411,12 @@ thead th{
 tbody td {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(11,18,32,0.06);
-display: flex;             /* Enables Flexbox */
-  align-items: center;       /* Centers items vertically */
-  justify-content: center;   /* Centers items horizontally */
+  /* CHANGE: Change 'top' to 'middle' so text is centered vertically */
+  vertical-align: middle; 
+  /* ADD: This forces the rows to have a consistent height */
   height: 64px; 
   font-size: 13px;
   color: var(--ink);
-}
-tbody td:first-child {
-  justify-content: flex-start; 
 }
 
 /* This targets the 4th column (Talk Title) specifically */
@@ -466,7 +462,7 @@ tbody tr:hover{
 
 /* The Date Shift Badge (+1d / -1d) */
 .date-shift {
-  display: inline-flex;
+  display: inline-block;
   background: var(--ink);
   color: #fff;
   font-size: 10px;
@@ -474,8 +470,6 @@ tbody tr:hover{
   border-radius: 4px;
   margin-left: 4px;
   font-weight: 800;
-   line-height: 1;            /* Prevents the badge from expanding vertically */
-  height: fit-content;
 }
 
 /* Highlighting the User's Local Detection Row */
@@ -647,7 +641,6 @@ tbody tr:hover{
   .mobile-toggle{ display:inline-flex; }
   .hero h2{ font-size: 34px; }
 }
-
 
 
 
