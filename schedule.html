@@ -42,10 +42,6 @@
         To ensure worldwide participation, the Global Seminar holds two sessions per month scheduled to provide accessible viewing hours 
         for researchers in all geographical regions.
       </p>
-      <div class="cta">
-        <a class="btn primary" href="https://berkeley.zoom.us/j/98901820849" target="_blank" rel="noopener">Join on Zoom</a>
-        <a class="btn gold" href="apply.html">Apply to Speak</a>
-      </div>
     </div> </section>
 
   <style>
@@ -114,8 +110,8 @@ function formatTime(utcHour, targetTimeZone) {
     
     let timeStr = date.toLocaleTimeString('en-US', options);
     
-    if (localDay > utcDay) timeStr += " <span class='date-shift'>+1d</span>";
-    if (localDay < utcDay) timeStr += " <span class='date-shift'>-1d</span>";
+    if (localDay > utcDay) timeStr += " <span class='date-shift'>TUE</span>";
+    if (localDay < utcDay) timeStr += " <span class='date-shift'>SUN</span>";
     
     return timeStr;
 }
