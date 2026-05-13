@@ -397,10 +397,11 @@ table{
   width:100%;
   border-collapse:collapse;
   min-width:760px;
+   table-layout: fixed; /* ADD THIS: Forces columns to respect widths */
 }
 
 thead th{
-  text-align:left;
+  text-align: center;
   padding: 12px 14px;
   font-size: 12px;
   color: var(--ink);
