@@ -60,12 +60,33 @@ function parseCSV(text) {
 function sheetDateKey(value) {
   const text = String(value || "").trim();
 
-  const iso = text.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:$|[ T])/
+  // Accept YYYY/MM/DD or YYYY-MM-DD.
+  const yearFirst = text.match(
+    /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})(?:$|[ T])/
   );
 
-  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  if (yearFirst) {
+    return [
+      yearFirst[1],
+      yearFirst[2].padStart(2, "0"),
+      yearFirst[3].padStart(2, "0")
+    ].join("-");
+  }
 
+  // Interpret existing slash dates as DD/MM/YYYY.
+  const dayFirst = text.match(
+    /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+  );
+
+  if (dayFirst) {
+    return [
+      dayFirst[3],
+      dayFirst[2].padStart(2, "0"),
+      dayFirst[1].padStart(2, "0")
+    ].join("-");
+  }
+
+  // Also accept dates such as April 20, 2026.
   const date = new Date(text);
   if (!Number.isFinite(date.getTime())) return "";
 
@@ -232,19 +253,17 @@ function parseCalendarEvent(event) {
     end: event.end,
     sortDate: calendarDateKey(event.start),
 
-    date: new Date(event.start).toLocaleDateString("en-US", {
-      timeZone: SEMINAR_TIME_ZONE,
-      year: "numeric",
-      month: "short",
-      day: "numeric"
-    }),
+date: calendarDateKey(event.start).replace(/-/g, "/"),
 
     speaker:
       readLabel(text, "Speaker") ||
       sentence?.[1]?.trim() ||
       "Speaker to be announced",
 
-    pi: [supervisor, institution].filter(Boolean).join(" · "),
+    pi: [
+  supervisor.replace(/^(?:Professor|Prof\.?)\s+/i, "").trim(),
+  institution
+].filter(Boolean).join(" · "),
 
     title:
       readLabel(text, "Talk title") ||
@@ -302,11 +321,11 @@ function renderNextTalk(next, calendarAvailable) {
 
   const start = new Date(next.start);
 
-  setText("nextDate", start.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  }));
+setText("nextDate", [
+  start.getFullYear(),
+  String(start.getMonth() + 1).padStart(2, "0"),
+  String(start.getDate()).padStart(2, "0")
+].join("/"));
 
   setText("localTime", start.toLocaleTimeString(undefined, {
     hour: "numeric",
@@ -409,12 +428,12 @@ async function loadArchive() {
             const date = String(columns[0] || "").trim();
 
             return {
-              date,
-              sortDate: sheetDateKey(date),
-              speaker: String(columns[1] || "").trim(),
-              pi: String(columns[2] || "").trim(),
-              title: String(columns[3] || "").trim()
-            };
+  date: sheetDateKey(date).replace(/-/g, "/"),
+  sortDate: sheetDateKey(date),
+  speaker: String(columns[1] || "").trim(),
+  pi: String(columns[2] || "").trim(),
+  title: String(columns[3] || "").trim()
+};
           });
       },
       "The older-talk archive"
