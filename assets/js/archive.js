@@ -6,7 +6,7 @@ const LEGACY_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?gid=0&single=true&output=csv";
 
 const ARCHIVE_CUTOFF = "2026-05-01";
-const SEMINAR_TIME_ZONE = "America/Los_Angeles";
+const SEMINAR_TIME_ZONE = "UTC";
 
 // Read CSV correctly, including commas, quotation marks,
 // and line breaks inside a presentation title.
