@@ -77,10 +77,10 @@
             <tr style="background: var(--tint-blue, #f8f9fa);">
               <th style="text-align: left;">Session</th>
               <th>UTC</th>
-              <th>America (PT)</th>
-              <th>Eur/Afr (CET)</th>
-              <th>Gulf (GST)</th>
-              <th>Asia-Pac (CST)</th>
+              <th>US / Canada Eastern (ET)</th>
+              <th>Central Europe (CET)</th>
+              <th>India (IST)</th>
+              <th>China / Singapore (CST)</th>
             </tr>
           </thead>
           <tbody id="scheduleBody">
@@ -122,10 +122,10 @@ const schedule = [
 ];
 
 const zones = [
-    "America/Los_Angeles",  // Americas (PT)
-    "Europe/Paris",         // Eur/Afr (CET)
-    "Asia/Dubai",           // Gulf (GST)
-    "Asia/Shanghai"         // Asia-Pac (CST) 
+    "America/New_York", // US Eastern
+    "Europe/Paris",    // Central Europe
+    "Asia/Kolkata",    // India
+    "Asia/Shanghai"    // China / Singapore
 ];
 
 const body = document.getElementById('scheduleBody');
