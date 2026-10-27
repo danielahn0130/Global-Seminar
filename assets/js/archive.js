@@ -255,7 +255,7 @@ function parseCalendarEvent(event) {
 
 date: calendarDateKey(event.start).replace(/-/g, "/"),
 
-    speaker:
+    speaker:(
       readLabel(text, "Speaker") ||
       sentence?.[1]?.trim() ||
       "Speaker to be announced"
