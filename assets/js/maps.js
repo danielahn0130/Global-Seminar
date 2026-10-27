@@ -7,10 +7,16 @@ async function initMap(type, elementId) {
         scrollWheelZoom: false,        // Enables mouse wheel & trackpad scroll
         touchZoom: true,              // Enables pinch-to-zoom on mobile/trackpads
         tap: true,                    // Better mobile interaction
-        attributionControl: false 
+        attributionControl: true 
     }).setView([20, 10], 2);
     // Light, clean base layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+    L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4w5b_1_73f0bc58b51c381723391800',
+    {
+        attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }
+).addTo(map);
 // --- ZOOM CONTROL LOGIC ---
 // Enable scroll zoom when the user clicks into the map
 map.on('focus', () => {map.scrollWheelZoom.enable();});
