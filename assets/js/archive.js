@@ -1,135 +1,306 @@
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?gid=0&single=true&output=csv";
+const CALENDAR_FEED_URL = "https://script.google.com/macros/s/AKfycbyHFZ4-tIDm5D15CAot7qbL_KVuMNoOUy5p9NFcYfqiTZZuPoYCu_mp4hg6NCKJezPfWQ/exec";
+const CALENDAR_CACHE_KEY = "gs-calendar-events-v1";
+
+// Convert Calendar's formatted descriptions into readable text.
+// Preserve link destinations even when the visible text says "Join here".
+function descriptionText(html) {
+  const doc = new DOMParser().parseFromString(
+    String(html || ""),
+    "text/html"
+  );
+
+  doc.querySelectorAll("script, style").forEach(el => el.remove());
+
+  doc.querySelectorAll("a").forEach(link => {
+    const href = link.getAttribute("href") || "";
+    const label = link.textContent || "";
+
+    link.replaceWith(
+      doc.createTextNode(`${label} ${href}`)
+    );
+  });
+
+  doc.querySelectorAll("br").forEach(el => {
+    el.replaceWith(doc.createTextNode("\n"));
+  });
+
+  doc.querySelectorAll("p, div, li").forEach(el => {
+    el.appendChild(doc.createTextNode("\n"));
+  });
+
+  return (doc.body.textContent || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\r/g, "");
+}
+
+function readLabel(text, label) {
+  const pattern = new RegExp(
+    "^\\s*" + label + "\\s*:\\s*(.+)$",
+    "im"
+  );
+
+  return text.match(pattern)?.[1]?.trim() || "";
+}
+
+function findMeetingLink(text) {
+  const links = text.match(/https?:\/\/[^\s<>"']+/gi) || [];
+
+  for (const candidate of links) {
+    const cleaned = candidate.replace(/[),.;]+$/, "");
+
+    try {
+      const url = new URL(cleaned);
+      const host = url.hostname.toLowerCase();
+
+      if (
+        host === "zoom.us" ||
+        host.endsWith(".zoom.us") ||
+        host === "zoom.com" ||
+        host.endsWith(".zoom.com") ||
+        host === "voovmeeting.com" ||
+        host.endsWith(".voovmeeting.com")
+      ) {
+        return url.href;
+      }
+    } catch {
+      // Ignore malformed URLs.
+    }
+  }
+
+  return "";
+}
+
+function parseCalendarEvent(event) {
+  const text = descriptionText(event.description);
+  const summary = String(event.title || "").trim();
+
+  // Your current titles place the talk title after the first colon.
+  const colon = summary.indexOf(":");
+  const heading = colon >= 0 ? summary.slice(0, colon) : summary;
+
+  const sentence = text.match(
+    /(?:^|\n)\s*([^,\n]+),\s*working with\s+(.+?)\s+will be our speaker\b/i
+  );
+
+  const supervisorInHeading = heading.match(
+    /\b((?:Professor|Prof\.?|Dr\.?)\s+.+?)(?:['’]s)?\s+Group\s*$/i
+  );
+
+  const speaker =
+    readLabel(text, "Speaker") ||
+    sentence?.[1]?.trim() ||
+    "Speaker to be announced";
+
+  const supervisor =
+    readLabel(text, "Supervisor") ||
+    sentence?.[2]?.trim() ||
+    supervisorInHeading?.[1]?.trim() ||
+    "";
+
+  const institution = readLabel(text, "Institution");
+
+  const title =
+    readLabel(text, "Talk title") ||
+    (colon >= 0 ? summary.slice(colon + 1).trim() : summary);
+
+  const joinUrl = findMeetingLink(
+    `${text}\n${event.location || ""}`
+  );
+
+  return {
+    start: event.start,
+    end: event.end,
+
+    // Keep the archive date consistent in the seminar's Pacific time zone.
+    date: new Date(event.start).toLocaleDateString("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }),
+
+    speaker,
+    pi: [supervisor, institution].filter(Boolean).join(" · "),
+    title,
+    joinUrl,
+    platform: joinUrl.includes("voovmeeting.com") ? "VooV" : "Zoom",
+    meetingId: readLabel(text, "Meeting ID"),
+    password:
+      readLabel(text, "Password") ||
+      readLabel(text, "Passcode")
+  };
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
+}
+
+function renderNextTalk(next) {
+  const dateElement = document.getElementById("nextDate");
+  if (!dateElement) return;
+
+  const card = dateElement.closest(".card");
+  card?.querySelector(".session-badge")?.remove();
+  card?.querySelector("[data-meeting-details]")?.remove();
+
+  const joinButton = document.getElementById("nextJoinLink");
+
+  if (!next) {
+    setText("nextSpeaker", "Next talk to be announced");
+    setText("nextPI", "");
+    setText("nextTitle", "Check back soon for our next seminar.");
+    setText("nextDate", "");
+    setText("localTime", "");
+
+    if (joinButton) joinButton.hidden = true;
+    return;
+  }
+
+  setText("nextSpeaker", next.speaker);
+  setText("nextPI", next.pi);
+  setText("nextTitle", next.title);
+
+  // Display both the date and time in the visitor's local time zone.
+  // This avoids pairing a Pacific date with a different local date.
+  const start = new Date(next.start);
+
+  setText("nextDate", start.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  }));
+
+  setText("localTime", start.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short"
+  }));
+
+  if (joinButton) {
+    joinButton.hidden = !next.joinUrl;
+
+    if (next.joinUrl) {
+      joinButton.href = next.joinUrl;
+      joinButton.textContent = `Join ${next.platform}`;
+    }
+  }
+
+  if (card && (next.meetingId || next.password)) {
+    const details = document.createElement("p");
+    details.className = "small";
+    details.dataset.meetingDetails = "";
+
+    details.textContent = [
+      next.meetingId ? `Meeting ID: ${next.meetingId}` : "",
+      next.password ? `Password: ${next.password}` : ""
+    ].filter(Boolean).join(" · ");
+
+    card.appendChild(details);
+  }
+}
+
+function applyCalendarEvents(events) {
+  const now = Date.now();
+
+  const talks = events
+    .filter(event =>
+      Number.isFinite(Date.parse(event.start)) &&
+      Number.isFinite(Date.parse(event.end))
+    )
+    .map(parseCalendarEvent)
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+
+  // Keep an ongoing talk available until its scheduled end.
+  const next = talks.find(talk => Date.parse(talk.end) > now);
+
+  window.GS_ARCHIVE = talks
+    .filter(talk => Date.parse(talk.end) <= now)
+    .sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+
+  renderNextTalk(next);
+  window.dispatchEvent(new CustomEvent("archiveLoaded"));
+}
 
 async function loadArchive() {
+  let events;
+
   try {
-    const res = await fetch(SHEET_URL);
-    const text = await res.text();
+    const response = await fetch(CALENDAR_FEED_URL);
 
-    // 1. Split into rows
-    const allRows = text.split("\n").slice(1);
+    if (!response.ok) {
+      throw new Error(`Calendar request failed: ${response.status}`);
+    }
 
-    // 2. The "Security Guard": Only keep rows that have a speaker name
-    // This prevents those empty rows at the bottom of your Sheet from appearing
-    const rows = allRows.filter(r => {
-      const columns = r.split(',');
-      // Check if the 2nd column (Speaker) exists and isn't just empty space
-      return columns[1] && columns[1].trim() !== "";
-    });
+    const data = await response.json();
 
-    // 3. Process the valid rows
-    const archive = rows.map(r => {
-      const cols = [];
-      let startValue = 0;
-      let inQuotes = false;
-      for (let i = 0; i < r.length; i++) {
-        if (r[i] === '"') inQuotes = !inQuotes;
-        if (r[i] === ',' && !inQuotes) {
-          cols.push(r.substring(startValue, i));
-          startValue = i + 1;
-        }
-      }
-      cols.push(r.substring(startValue));
+    if (data.error || !Array.isArray(data.events)) {
+      throw new Error(data.error || "Invalid calendar response.");
+    }
 
-      const clean = (str) => str ? str.replace(/^["\s]+|["\s]+$/g, '').trim() : "";
+    events = data.events;
 
-      return {
-        date: clean(cols[0]),
-        speaker: clean(cols[1]),
-        pi: clean(cols[2]),
-        title: clean(cols[3]),
-        status: clean(cols[4])
-      };
-    });
+    try {
+      localStorage.setItem(CALENDAR_CACHE_KEY, JSON.stringify({
+        savedAt: new Date().toISOString(),
+        events
+      }));
+    } catch {
+      // The calendar can still load if browser storage is unavailable.
+    }
 
-    // 4. Flip the order so newest is on top
-    archive.reverse();
-
-    // ... rest of your code (window.GS_ARCHIVE = archive, etc.)
-
-    window.GS_ARCHIVE = archive;
-    window.dispatchEvent(new CustomEvent('archiveLoaded'));
-    renderNextTalk(archive);
-    
   } catch (error) {
-    console.error("Could not load the sheet:", error);
-  }
-}
+    console.error("Could not load the calendar:", error);
 
-function convertToLocalTime(dateStr) {
-  if (!dateStr) return "";
+    let cached;
 
-  // 1. Create a date object from the string in your sheet (e.g., "March 2, 2026")
-  const eventDate = new Date(dateStr);
-  if (isNaN(eventDate.getTime())) return "";
+    try {
+      cached = JSON.parse(
+        localStorage.getItem(CALENDAR_CACHE_KEY) || "null"
+      );
+    } catch {
+      cached = null;
+    }
 
-  // 2. Logic: If day is 1-14, use 17:00 UTC. If 15-31, use 04:00 UTC.
-  const dayOfMonth = eventDate.getDate();
-  const hourUTC = (dayOfMonth <= 14) ? 17 : 4;
+    if (cached && Array.isArray(cached.events)) {
+      events = cached.events;
 
-  // 3. Set the hours in UTC
-  eventDate.setUTCHours(hourUTC, 0, 0);
+      const notice = document.createElement("p");
+      notice.className = "small";
+      notice.textContent =
+        "Calendar temporarily unavailable. Showing saved information from " +
+        new Date(cached.savedAt).toLocaleString() + ".";
 
-  // 4. Convert to the user's local string
-  const options = { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
-    
-    // Date shift logic
-    const utcDay = eventDate.getUTCDate();
-    const localDay = new Date(eventDate.toLocaleString('en-US')).getDate();
-    let shift = "";
-    if (localDay > utcDay) shift = " (+1 day)";
-    if (localDay < utcDay) shift = " (-1 day)";
+      document.querySelector(".tablewrap")?.before(notice);
 
-    return `${eventDate.toLocaleTimeString('en-US', options)}${shift}`;
-}
+    } else {
+      setText("nextSpeaker", "Schedule temporarily unavailable");
+      setText("nextPI", "");
+      setText("nextTitle", "Please check the embedded calendar.");
+      setText("nextDate", "");
+      setText("localTime", "");
 
-function renderNextTalk(data) {
-  const next = data.find(d => d.status === "Next");
-  if (!next) return;
+      const button = document.getElementById("nextJoinLink");
+      if (button) button.hidden = true;
 
-  const nextDateEl = document.getElementById("nextDate");
-  if (!nextDateEl) return;
+      const body = document.querySelector("[data-archive-body]");
 
-  // 1. Fill in basic info
-  document.getElementById("nextSpeaker").innerText = next.speaker;
-  document.getElementById("nextPI").innerText = next.pi;
-  document.getElementById("nextTitle").innerText = next.title;
-  nextDateEl.innerText = next.date;
+      if (body) {
+        const row = body.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 4;
+        cell.textContent =
+          "The archive could not be loaded. Please try again later.";
+      }
 
-  // 2. Logic for Session Badges
-  const eventDate = new Date(next.date);
-  const day = eventDate.getDate();
-  
-  // Create the badge element
-  const badge = document.createElement("span");
-  badge.className = "session-badge";
-  
-  if (day <= 14) {
-    badge.innerText = "Session A: 17:00 UTC";
-    badge.classList.add("badge-atlantic");
-  } else {
-    badge.innerText = "Session B: 04:00 UTC";
-    badge.classList.add("badge-pacific");
+      return;
+    }
   }
 
-  // 3. Put the badge at the top of the card (above the speaker name)
-  const card = document.querySelector(".card"); // Finds the next talk card
-  // Remove old badge if it exists so they don't stack
-  const oldBadge = card.querySelector(".session-badge");
-  if (oldBadge) oldBadge.remove();
-  
-  card.prepend(badge);
+  applyCalendarEvents(events);
 
-  // 4. Update Local Time
-  const localTimeEl = document.getElementById("localTime");
-  if (localTimeEl) {
-    localTimeEl.innerText = convertToLocalTime(next.date);
-  }
+  // Move completed talks into the archive even if the page stays open.
+  window.setInterval(() => applyCalendarEvents(events), 60000);
 }
 
 loadArchive();
-
-
-
-
-
-
