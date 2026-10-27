@@ -72,7 +72,7 @@
       <p class="meta">Times below adjust automatically for your local Daylight Saving Time (DST) offsets.</p>
       
       <div class="tablewrap">
-        <table id="timeTable" style="width: 100%; min-width: 800px; border-collapse: collapse;">
+        <table id="timeTable" style="width: 100%; min-width: 800px; border-collapse: collapse; table-layout: fixed;">
           <thead>
             <tr style="background: var(--tint-blue, #f8f9fa);">
               <th style="text-align: left;">Session</th>
@@ -117,7 +117,7 @@ function formatTime(utcHour, targetTimeZone) {
 }
 
 const schedule = [
-    { name: "Session A", utc: 17 },
+    { name: "Session A", utc: 16 },
     { name: "Session B", utc: 4 }
 ];
 
@@ -151,7 +151,7 @@ schedule.forEach(s => {
       <td><strong>Your Local Time</strong></td>
       <td>—</td>
       <td colspan="4" style="text-align: center;">
-        <strong>Session A:</strong> ${formatTime(17, userZone)} &nbsp; | &nbsp; 
+        <strong>Session A:</strong> ${formatTime(16, userZone)} &nbsp; | &nbsp; 
         <strong>Session B:</strong> ${formatTime(4, userZone)}
         <br><small style="opacity: 0.7;">(Detected Zone: ${userZone.replace('_', ' ')})</small>
       </td>
