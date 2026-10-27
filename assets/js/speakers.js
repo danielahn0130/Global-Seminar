@@ -14,12 +14,19 @@ window.addEventListener('archiveLoaded', function() {
     
     list.forEach(r => {
       const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${r.date}</td>
-        <td><strong>${r.speaker}</strong></td>
-        <td>${r.pi}</td>
-        <td>${r.title}</td>
-      `;
+[r.date, r.speaker, r.pi, r.title].forEach((value, index) => {
+  const td = document.createElement("td");
+
+  if (index === 1) {
+    const strong = document.createElement("strong");
+    strong.textContent = value || "";
+    td.appendChild(strong);
+  } else {
+    td.textContent = value || "";
+  }
+
+  tr.appendChild(td);
+});
       body.appendChild(tr);
     });
   }
