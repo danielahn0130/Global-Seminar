@@ -258,7 +258,8 @@ date: calendarDateKey(event.start).replace(/-/g, "/"),
     speaker:
       readLabel(text, "Speaker") ||
       sentence?.[1]?.trim() ||
-      "Speaker to be announced",
+      "Speaker to be announced"
+    ).replace(/^Dr\.?\s+/i, "").trim(),
 
     pi: [
   supervisor.replace(/^(?:Professor|Prof\.?)\s+/i, "").trim(),
