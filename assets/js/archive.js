@@ -1,8 +1,151 @@
+// Paste the Calendar Apps Script URL you are already using here.
 const CALENDAR_FEED_URL = "https://script.google.com/macros/s/AKfycbyHFZ4-tIDm5D15CAot7qbL_KVuMNoOUy5p9NFcYfqiTZZuPoYCu_mp4hg6NCKJezPfWQ/exec";
-const CALENDAR_CACHE_KEY = "gs-calendar-events-v1";
 
-// Convert Calendar's formatted descriptions into readable text.
-// Preserve link destinations even when the visible text says "Join here".
+// Existing Google Sheet for the older talks.
+const LEGACY_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4kS-5UBlIb7AhPnVaJiXqggkptvdw2A2oh3YbN4rFd0wzG-YpZCDpwpZfsYgPaTPLtp6q8li9SLFN/pub?gid=0&single=true&output=csv";
+
+const ARCHIVE_CUTOFF = "2026-05-01";
+const SEMINAR_TIME_ZONE = "America/Los_Angeles";
+
+// Read CSV correctly, including commas, quotation marks,
+// and line breaks inside a presentation title.
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+
+  text = text.replace(/^\uFEFF/, "");
+
+  for (let i = 0; i < text.length; i++) {
+    const character = text[i];
+
+    if (character === '"') {
+      if (quoted && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else {
+        quoted = !quoted;
+      }
+    } else if (character === "," && !quoted) {
+      row.push(field);
+      field = "";
+    } else if (
+      (character === "\n" || character === "\r") &&
+      !quoted
+    ) {
+      if (character === "\r" && text[i + 1] === "\n") i++;
+
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += character;
+    }
+  }
+
+  if (quoted) throw new Error("Incomplete CSV response.");
+
+  if (field.length || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+// Convert Sheet dates to YYYY-MM-DD for filtering and sorting.
+function sheetDateKey(value) {
+  const text = String(value || "").trim();
+
+  const iso = text.match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:$|[ T])/
+  );
+
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+
+  const date = new Date(text);
+  if (!Number.isFinite(date.getTime())) return "";
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
+// Apply the Calendar cutoff using the seminar's Pacific date.
+function calendarDateKey(value) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: SEMINAR_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date(value));
+
+  const values = Object.fromEntries(
+    parts.map(part => [part.type, part.value])
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+// Read one source, with a saved browser copy as a fallback.
+async function loadSource(url, cacheKey, convert, label) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`${label}: HTTP ${response.status}`);
+    }
+
+    const rows = await convert(response);
+
+    if (!Array.isArray(rows)) {
+      throw new Error(`${label}: invalid response.`);
+    }
+
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        savedAt: new Date().toISOString(),
+        rows
+      }));
+    } catch {
+      // Loading still works when browser storage is unavailable.
+    }
+
+    return { rows, warning: "" };
+  } catch (error) {
+    console.error(error);
+
+    try {
+      const cached = JSON.parse(
+        localStorage.getItem(cacheKey) || "null"
+      );
+
+      if (cached && Array.isArray(cached.rows)) {
+        return {
+          rows: cached.rows,
+          warning:
+            `${label} is temporarily unavailable. ` +
+            "Showing saved information from " +
+            new Date(cached.savedAt).toLocaleString() + "."
+        };
+      }
+    } catch {
+      // No usable saved copy.
+    }
+
+    return {
+      rows: null,
+      warning: `${label} could not be loaded.`
+    };
+  }
+}
+
+// Convert formatted Calendar descriptions into plain text,
+// preserving meeting-link destinations.
 function descriptionText(html) {
   const doc = new DOMParser().parseFromString(
     String(html || ""),
@@ -12,12 +155,9 @@ function descriptionText(html) {
   doc.querySelectorAll("script, style").forEach(el => el.remove());
 
   doc.querySelectorAll("a").forEach(link => {
-    const href = link.getAttribute("href") || "";
-    const label = link.textContent || "";
-
-    link.replaceWith(
-      doc.createTextNode(`${label} ${href}`)
-    );
+    link.replaceWith(doc.createTextNode(
+      `${link.textContent || ""} ${link.getAttribute("href") || ""}`
+    ));
   });
 
   doc.querySelectorAll("br").forEach(el => {
@@ -34,31 +174,23 @@ function descriptionText(html) {
 }
 
 function readLabel(text, label) {
-  const pattern = new RegExp(
-    "^\\s*" + label + "\\s*:\\s*(.+)$",
-    "im"
-  );
-
-  return text.match(pattern)?.[1]?.trim() || "";
+  return text.match(
+    new RegExp("^\\s*" + label + "\\s*:\\s*(.+)$", "im")
+  )?.[1]?.trim() || "";
 }
 
 function findMeetingLink(text) {
   const links = text.match(/https?:\/\/[^\s<>"']+/gi) || [];
 
   for (const candidate of links) {
-    const cleaned = candidate.replace(/[),.;]+$/, "");
-
     try {
-      const url = new URL(cleaned);
+      const url = new URL(candidate.replace(/[),.;]+$/, ""));
       const host = url.hostname.toLowerCase();
 
       if (
-        host === "zoom.us" ||
-        host.endsWith(".zoom.us") ||
-        host === "zoom.com" ||
-        host.endsWith(".zoom.com") ||
-        host === "voovmeeting.com" ||
-        host.endsWith(".voovmeeting.com")
+        ["zoom.us", "zoom.com", "voovmeeting.com"].some(
+          domain => host === domain || host.endsWith("." + domain)
+        )
       ) {
         return url.href;
       }
@@ -73,8 +205,6 @@ function findMeetingLink(text) {
 function parseCalendarEvent(event) {
   const text = descriptionText(event.description);
   const summary = String(event.title || "").trim();
-
-  // Your current titles place the talk title after the first colon.
   const colon = summary.indexOf(":");
   const heading = colon >= 0 ? summary.slice(0, colon) : summary;
 
@@ -86,11 +216,6 @@ function parseCalendarEvent(event) {
     /\b((?:Professor|Prof\.?|Dr\.?)\s+.+?)(?:['’]s)?\s+Group\s*$/i
   );
 
-  const speaker =
-    readLabel(text, "Speaker") ||
-    sentence?.[1]?.trim() ||
-    "Speaker to be announced";
-
   const supervisor =
     readLabel(text, "Supervisor") ||
     sentence?.[2]?.trim() ||
@@ -98,11 +223,6 @@ function parseCalendarEvent(event) {
     "";
 
   const institution = readLabel(text, "Institution");
-
-  const title =
-    readLabel(text, "Talk title") ||
-    (colon >= 0 ? summary.slice(colon + 1).trim() : summary);
-
   const joinUrl = findMeetingLink(
     `${text}\n${event.location || ""}`
   );
@@ -110,18 +230,26 @@ function parseCalendarEvent(event) {
   return {
     start: event.start,
     end: event.end,
+    sortDate: calendarDateKey(event.start),
 
-    // Keep the archive date consistent in the seminar's Pacific time zone.
     date: new Date(event.start).toLocaleDateString("en-US", {
-      timeZone: "America/Los_Angeles",
+      timeZone: SEMINAR_TIME_ZONE,
       year: "numeric",
       month: "short",
       day: "numeric"
     }),
 
-    speaker,
+    speaker:
+      readLabel(text, "Speaker") ||
+      sentence?.[1]?.trim() ||
+      "Speaker to be announced",
+
     pi: [supervisor, institution].filter(Boolean).join(" · "),
-    title,
+
+    title:
+      readLabel(text, "Talk title") ||
+      (colon >= 0 ? summary.slice(colon + 1).trim() : summary),
+
     joinUrl,
     platform: joinUrl.includes("voovmeeting.com") ? "VooV" : "Zoom",
     meetingId: readLabel(text, "Meeting ID"),
@@ -136,20 +264,31 @@ function setText(id, value) {
   if (element) element.textContent = value;
 }
 
-function renderNextTalk(next) {
+function renderNextTalk(next, calendarAvailable) {
   const dateElement = document.getElementById("nextDate");
   if (!dateElement) return;
 
   const card = dateElement.closest(".card");
+  const joinButton = document.getElementById("nextJoinLink");
+
   card?.querySelector(".session-badge")?.remove();
   card?.querySelector("[data-meeting-details]")?.remove();
 
-  const joinButton = document.getElementById("nextJoinLink");
-
   if (!next) {
-    setText("nextSpeaker", "Next talk to be announced");
+    setText(
+      "nextSpeaker",
+      calendarAvailable
+        ? "Next talk to be announced"
+        : "Schedule temporarily unavailable"
+    );
+
     setText("nextPI", "");
-    setText("nextTitle", "Check back soon for our next seminar.");
+    setText(
+      "nextTitle",
+      calendarAvailable
+        ? "Check back soon for our next seminar."
+        : "Please check the embedded calendar."
+    );
     setText("nextDate", "");
     setText("localTime", "");
 
@@ -161,8 +300,6 @@ function renderNextTalk(next) {
   setText("nextPI", next.pi);
   setText("nextTitle", next.title);
 
-  // Display both the date and time in the visitor's local time zone.
-  // This avoids pairing a Pacific date with a different local date.
   const start = new Date(next.start);
 
   setText("nextDate", start.toLocaleDateString(undefined, {
@@ -200,107 +337,118 @@ function renderNextTalk(next) {
   }
 }
 
-function applyCalendarEvents(events) {
+function applyCombinedArchive(events, legacyRows, calendarAvailable) {
   const now = Date.now();
 
-  const talks = events
+  // Calendar contributes only talks on or after May 1, 2026.
+  const calendarTalks = events
     .filter(event =>
       Number.isFinite(Date.parse(event.start)) &&
-      Number.isFinite(Date.parse(event.end))
+      Number.isFinite(Date.parse(event.end)) &&
+      calendarDateKey(event.start) >= ARCHIVE_CUTOFF
     )
     .map(parseCalendarEvent)
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
 
-  // Keep an ongoing talk available until its scheduled end.
-  const next = talks.find(talk => Date.parse(talk.end) > now);
+  // Google Sheets contributes only talks before May 1, 2026.
+  const olderTalks = legacyRows.filter(row =>
+    row.sortDate && row.sortDate < ARCHIVE_CUTOFF
+  );
 
-  window.GS_ARCHIVE = talks
-    .filter(talk => Date.parse(talk.end) <= now)
-    .sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+  const completedCalendarTalks = calendarTalks.filter(
+    talk => Date.parse(talk.end) <= now
+  );
 
-  renderNextTalk(next);
+  window.GS_ARCHIVE = [
+    ...olderTalks,
+    ...completedCalendarTalks
+  ].sort((a, b) =>
+    b.sortDate.localeCompare(a.sortDate) ||
+    Date.parse(b.start || 0) - Date.parse(a.start || 0)
+  );
+
+  const next = calendarTalks.find(
+    talk => Date.parse(talk.end) > now
+  );
+
+  renderNextTalk(next, calendarAvailable);
   window.dispatchEvent(new CustomEvent("archiveLoaded"));
 }
 
 async function loadArchive() {
-  let events;
+  const [calendar, legacy] = await Promise.all([
+    loadSource(
+      CALENDAR_FEED_URL,
+      "gs-calendar-source-v2",
+      async response => {
+        const data = await response.json();
 
-  try {
-    const response = await fetch(CALENDAR_FEED_URL);
+        if (data.error || !Array.isArray(data.events)) {
+          throw new Error(data.error || "Invalid Calendar data.");
+        }
 
-    if (!response.ok) {
-      throw new Error(`Calendar request failed: ${response.status}`);
-    }
+        return data.events;
+      },
+      "Google Calendar"
+    ),
 
-    const data = await response.json();
+    loadSource(
+      LEGACY_SHEET_URL,
+      "gs-legacy-source-v2",
+      async response => {
+        const text = await response.text();
 
-    if (data.error || !Array.isArray(data.events)) {
-      throw new Error(data.error || "Invalid calendar response.");
-    }
+        if (/^\s*</.test(text)) {
+          throw new Error("The Sheet returned a web page instead of CSV.");
+        }
 
-    events = data.events;
+        return parseCSV(text)
+          .slice(1)
+          .filter(columns => String(columns[1] || "").trim())
+          .map(columns => {
+            const date = String(columns[0] || "").trim();
 
-    try {
-      localStorage.setItem(CALENDAR_CACHE_KEY, JSON.stringify({
-        savedAt: new Date().toISOString(),
-        events
-      }));
-    } catch {
-      // The calendar can still load if browser storage is unavailable.
-    }
+            return {
+              date,
+              sortDate: sheetDateKey(date),
+              speaker: String(columns[1] || "").trim(),
+              pi: String(columns[2] || "").trim(),
+              title: String(columns[3] || "").trim()
+            };
+          });
+      },
+      "The older-talk archive"
+    )
+  ]);
 
-  } catch (error) {
-    console.error("Could not load the calendar:", error);
+  document.querySelector("[data-archive-notice]")?.remove();
 
-    let cached;
+  const warnings = [calendar.warning, legacy.warning].filter(Boolean);
 
-    try {
-      cached = JSON.parse(
-        localStorage.getItem(CALENDAR_CACHE_KEY) || "null"
-      );
-    } catch {
-      cached = null;
-    }
+  if (warnings.length) {
+    const notice = document.createElement("p");
+    notice.className = "small";
+    notice.dataset.archiveNotice = "";
+    notice.setAttribute("role", "status");
+    notice.textContent = warnings.join(" ");
 
-    if (cached && Array.isArray(cached.events)) {
-      events = cached.events;
+    const target =
+      document.querySelector(".tablewrap") ||
+      document.getElementById("nextDate")?.closest(".card");
 
-      const notice = document.createElement("p");
-      notice.className = "small";
-      notice.textContent =
-        "Calendar temporarily unavailable. Showing saved information from " +
-        new Date(cached.savedAt).toLocaleString() + ".";
-
-      document.querySelector(".tablewrap")?.before(notice);
-
-    } else {
-      setText("nextSpeaker", "Schedule temporarily unavailable");
-      setText("nextPI", "");
-      setText("nextTitle", "Please check the embedded calendar.");
-      setText("nextDate", "");
-      setText("localTime", "");
-
-      const button = document.getElementById("nextJoinLink");
-      if (button) button.hidden = true;
-
-      const body = document.querySelector("[data-archive-body]");
-
-      if (body) {
-        const row = body.insertRow();
-        const cell = row.insertCell();
-        cell.colSpan = 4;
-        cell.textContent =
-          "The archive could not be loaded. Please try again later.";
-      }
-
-      return;
-    }
+    target?.before(notice);
   }
 
-  applyCalendarEvents(events);
+  const update = () => applyCombinedArchive(
+    calendar.rows || [],
+    legacy.rows || [],
+    calendar.rows !== null
+  );
 
-  // Move completed talks into the archive even if the page stays open.
-  window.setInterval(() => applyCalendarEvents(events), 60000);
+  update();
+
+  // Update which talk is next while the page remains open.
+  window.setInterval(update, 60000);
 }
 
 loadArchive();
